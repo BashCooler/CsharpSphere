@@ -37,6 +37,9 @@ public static partial class Program
         _gl = _window.CreateOpenGL();
         _input = _window.CreateInput();
         _controller = new ImGuiController(_gl, _window, _input);
+
+        var result = Sphere.GeneratePoints();
+        int a = 1;
     }
 
     private static void OnUpdate(double deltaTime) { }

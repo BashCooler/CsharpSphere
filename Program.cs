@@ -38,7 +38,8 @@ public static partial class Program
         _input = _window.CreateInput();
         _controller = new ImGuiController(_gl, _window, _input);
 
-        var result = Sphere.GeneratePoints();
+        var points = Sphere.GeneratePoints();
+        var tris = Sphere.GenerateTriangles(points);
         int a = 1;
     }
 

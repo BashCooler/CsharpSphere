@@ -1,8 +1,13 @@
-﻿using Silk.NET.Input;
+﻿using System.Diagnostics;
+using Silk.NET.Input;
 using Silk.NET.Maths;
-using Silk.NET.OpenGL;
+// using Silk.NET.OpenGL;
+using Silk.NET.OpenGL.Legacy;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
+
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace CSharpSphere;
 
@@ -21,6 +26,11 @@ public static partial class Program
         {
             Title = "Silk.NET Sphere",
             Size = new Vector2D<int>(800, 600),
+            API = new GraphicsAPI(
+                ContextAPI.OpenGL,
+                ContextProfile.Compatability,
+                ContextFlags.Default,
+                new APIVersion(3, 3))
         };
         _window = Window.Create(options);
         _window.Load += OnLoad;
@@ -34,13 +44,9 @@ public static partial class Program
 
     private static void OnLoad()
     {
-        _gl = _window.CreateOpenGL();
+        _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        _controller = new ImGuiController(_gl, _window, _input);
-
-        var points = Sphere.GeneratePoints();
-        var tris = Sphere.GenerateTriangles(points);
-        int a = 1;
+        // _controller = new ImGuiController(_gl, _window, _input);
     }
 
     private static void OnUpdate(double deltaTime) { }
@@ -50,7 +56,8 @@ public static partial class Program
         _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         
-        RenderUI(deltaTime);
+        // RenderUI(deltaTime);
+        DrawWireframeSphere();
     }
 
     private static void OnClose()
@@ -58,5 +65,47 @@ public static partial class Program
         _controller.Dispose();
         _input.Dispose();
         _gl.Dispose();
+    }
+    
+    private static void DrawWireframeSphere()
+    {
+        var watch = Stopwatch.StartNew();
+        
+        _gl.MatrixMode(GLEnum.Projection);
+        _gl.LoadIdentity();
+        _gl.Ortho(-1.5, 1.5, -1.5, 1.5, -10, 10);
+
+        _gl.MatrixMode(GLEnum.Modelview);
+        _gl.LoadIdentity();
+
+        _gl.Begin(GLEnum.Lines);
+        _gl.Color3(0.0f, 1.0f, 0.0f);   // зелёные линии
+
+        var points = Sphere.GeneratePoints();
+        var triangles = Sphere.GenerateTriangles(points);
+
+        float scale = 0.85f;   // чтобы красиво помещалась
+
+        foreach (var tri in triangles)
+        {
+            // берём индексы из твоей структуры
+            var p1 = points[tri.Point1.Row, tri.Point1.Col];
+            var p2 = points[tri.Point2.Row, tri.Point2.Col];
+            var p3 = points[tri.Point3.Row, tri.Point3.Col];
+
+            // рисуем 3 ребра треугольника
+            _gl.Vertex2(p1.X * scale, p1.Y * scale);
+            _gl.Vertex2(p2.X * scale, p2.Y * scale);
+
+            _gl.Vertex2(p2.X * scale, p2.Y * scale);
+            _gl.Vertex2(p3.X * scale, p3.Y * scale);
+
+            _gl.Vertex2(p3.X * scale, p3.Y * scale);
+            _gl.Vertex2(p1.X * scale, p1.Y * scale);
+        }
+
+        _gl.End();
+        watch.Stop();
+        Console.WriteLine($"Drawn sphere, took {watch.ElapsedMilliseconds} ms");
     }
 }

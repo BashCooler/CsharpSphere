@@ -75,7 +75,7 @@ public class Sphere
 
     public void DrawWireframeSphere(GL gl)
     {
-        var watch = Stopwatch.StartNew();
+        // var watch = Stopwatch.StartNew();
 
         gl.LoadIdentity();
         gl.Begin(GLEnum.Lines);
@@ -103,7 +103,7 @@ public class Sphere
         }
 
         gl.End();
-        Messenger.Update(watch.ElapsedMilliseconds);
-        watch.Stop();
+        // Messenger.Update(watch.ElapsedMilliseconds);
+        // watch.Stop();
     }
 }

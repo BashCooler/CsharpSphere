@@ -75,16 +75,16 @@ public class Sphere
 
     public void DrawWireframeSphere(GL gl)
     {
-        // var watch = Stopwatch.StartNew();
-
-        gl.LoadIdentity();
-        gl.Begin(GLEnum.Lines);
-        gl.Color3(0.0f, 0.8f, 0.0f);
+        var watch = Stopwatch.StartNew();
 
         var points = GeneratePoints();
         var triangles = GenerateTriangles(points);
-
+        
         const float scale = 0.85f;
+        
+        gl.LoadIdentity();
+        gl.Begin(GLEnum.Lines);
+        gl.Color3(0.8f, 0.8f, 0.8f);
 
         foreach (var tri in triangles)
         {
@@ -103,7 +103,7 @@ public class Sphere
         }
 
         gl.End();
-        // Messenger.Update(watch.ElapsedMilliseconds);
-        // watch.Stop();
+        Messenger.Update(watch.ElapsedMilliseconds);
+        watch.Stop();
     }
 }

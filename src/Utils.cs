@@ -31,6 +31,6 @@ public class Messenger
     {
         // Message = $"\n{spinner[s]} Drawn sphere, took {ms} ms";
         Message = $"\nFrame Time: {ms} ms";
-        s += 1; if (s > 3) s = 0;
+        // s += 1; if (s > 3) s = 0;
     }
 }

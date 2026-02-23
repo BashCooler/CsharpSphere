@@ -1,9 +1,8 @@
 ﻿using System.Diagnostics;
 using Silk.NET.Input;
 using Silk.NET.Maths;
-// using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Legacy;
-using Silk.NET.OpenGL.Extensions.ImGui;
+using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 using Silk.NET.Windowing;
 
 
@@ -46,7 +45,7 @@ public static partial class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        // _controller = new ImGuiController(_gl, _window, _input);
+        _controller = new ImGuiController(_gl, _window, _input);
     }
 
     private static void OnUpdate(double deltaTime) { }
@@ -56,8 +55,8 @@ public static partial class Program
         _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         
-        // RenderUI(deltaTime);
         DrawWireframeSphere();
+        RenderUI(deltaTime);
     }
 
     private static void OnClose()
@@ -79,21 +78,19 @@ public static partial class Program
         _gl.LoadIdentity();
 
         _gl.Begin(GLEnum.Lines);
-        _gl.Color3(0.0f, 1.0f, 0.0f);   // зелёные линии
+        _gl.Color3(0.0f, 0.8f, 0.0f);
 
         var points = Sphere.GeneratePoints();
         var triangles = Sphere.GenerateTriangles(points);
 
-        float scale = 0.85f;   // чтобы красиво помещалась
+        float scale = 0.85f;
 
         foreach (var tri in triangles)
         {
-            // берём индексы из твоей структуры
             var p1 = points[tri.Point1.Row, tri.Point1.Col];
             var p2 = points[tri.Point2.Row, tri.Point2.Col];
             var p3 = points[tri.Point3.Row, tri.Point3.Col];
-
-            // рисуем 3 ребра треугольника
+            
             _gl.Vertex2(p1.X * scale, p1.Y * scale);
             _gl.Vertex2(p2.X * scale, p2.Y * scale);
 

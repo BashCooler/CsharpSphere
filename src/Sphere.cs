@@ -73,6 +73,21 @@ public class Sphere
         return triangles;
     }
 
+    /// <summary>
+    ///     Вызывает методы <see cref="GeneratePoints" /> и <see cref="GenerateTriangles" /> для создания
+    ///     массива точек и массива треугольников. Выполняет отрисовку сферы посредством OpenGL.
+    ///     <list type="number">
+    ///         <item>Процесс начинается вызовом <see cref="GL.Begin(GLEnum)" /></item>
+    ///         <item>
+    ///             Происходит отрисовка линий <see cref="GLEnum.Lines" /> между вершинами треугольников.
+    ///             Вершины (точки) задаются методом <see cref="GL.Vertex2(float, float)" />
+    ///         </item>
+    ///         <item>Процесс завершается командой <see cref="GL.End" /></item>
+    ///     </list>
+    /// </summary>
+    /// <seealso href="https://registry.khronos.org/OpenGL/specs/gl/glspec30.pdf#subsection.2.6.1">
+    ///     Спецификация OpenGL 3.0
+    /// </seealso>
     public void DrawWireframeSphere(GL gl)
     {
         var watch = Stopwatch.StartNew();
@@ -82,10 +97,8 @@ public class Sphere
         
         const float scale = 0.85f;
         
-        gl.LoadIdentity();
         gl.Begin(GLEnum.Lines);
         gl.Color3(0.8f, 0.8f, 0.8f);
-
         foreach (var tri in triangles)
         {
             var p1 = points[tri.Point1.Row, tri.Point1.Col];
@@ -101,8 +114,8 @@ public class Sphere
             gl.Vertex2(p3.X * scale, p3.Y * scale);
             gl.Vertex2(p1.X * scale, p1.Y * scale);
         }
-
         gl.End();
+        
         Messenger.Update(watch.ElapsedMilliseconds);
         watch.Stop();
     }

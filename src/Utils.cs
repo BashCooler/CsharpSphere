@@ -30,7 +30,7 @@ public class Messenger
     public void Update(long ms)
     {
         // Message = $"\n{spinner[s]} Drawn sphere, took {ms} ms";
-        Message = $"\nFrame Time: {ms} ms";
+        Message = $"Время кадра: {ms} ms";
         // s += 1; if (s > 3) s = 0;
     }
 }

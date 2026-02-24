@@ -5,6 +5,7 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL.Legacy;
 using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 using Silk.NET.Windowing;
+using ImGuiNET;
 
 namespace CSharpSphere;
 
@@ -43,8 +44,20 @@ public static partial class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        _controller = new ImGuiController(_gl, _window, _input);
+        ConfigureUI(13, 1.0f, 1.0f);  // 1920x1080
         OnResize(_window.Size);
+    }
+
+    private static void ConfigureUI(int fontSize, float fontScale, float scale)
+    {
+        var fontConfig = new ImGuiFontConfig(
+            Path.Combine(AppContext.BaseDirectory, "fonts", "arial.ttf"),
+            fontSize,
+            io => io.Fonts.GetGlyphRangesCyrillic());
+
+        _controller = new ImGuiController(_gl, _window, _input, fontConfig);
+        ImGui.GetIO().FontGlobalScale = fontScale;
+        ImGui.GetStyle().ScaleAllSizes(scale);
     }
 
     private static void OnUpdate(double deltaTime) { }

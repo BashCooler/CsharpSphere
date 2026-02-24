@@ -23,7 +23,7 @@ public static partial class Program
         var options = WindowOptions.Default with
         {
             Title = "Silk.NET Sphere",
-            Size = new Vector2D<int>(800, 600),
+            Size = new Vector2D<int>(1280, 720),
             API = new GraphicsAPI(
                 ContextAPI.OpenGL,
                 ContextProfile.Compatability,
@@ -44,14 +44,14 @@ public static partial class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        ConfigureUI(13, 1.0f, 1.0f);  // 1920x1080
+        ConfigureUI(18, 1.0f, 1.0f);  // 1920x1080
         OnResize(_window.Size);
     }
 
     private static void ConfigureUI(int fontSize, float fontScale, float scale)
     {
         var fontConfig = new ImGuiFontConfig(
-            Path.Combine(AppContext.BaseDirectory, "fonts", "arial.ttf"),
+            Path.Combine(AppContext.BaseDirectory, "fonts", "JetBrainsMonoNL-Regular.ttf"),
             fontSize,
             io => io.Fonts.GetGlyphRangesCyrillic());
 

@@ -43,14 +43,14 @@ public static partial class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        ConfigureUi(18);
+        ConfigureUi(12);
         OnResize(_window.Size);
     }
 
     private static void ConfigureUi(int fontSize, float fontScale = 1.0f, float scale = 1.0f)
     {
         var fontConfig = new ImGuiFontConfig(
-            Path.Combine(AppContext.BaseDirectory, "fonts", "JetBrainsMonoNL-Regular.ttf"),
+            Path.Combine(AppContext.BaseDirectory, "fonts", "Better VCR 6.1.ttf"),
             fontSize,
             io => io.Fonts.GetGlyphRangesCyrillic());
 

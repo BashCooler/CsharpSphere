@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="fonts\JetBrainsMonoNL-Regular.ttf">
+      <None Update="fonts\Better VCR 6.1.ttf">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

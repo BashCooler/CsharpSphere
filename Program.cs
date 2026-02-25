@@ -5,7 +5,6 @@ using Silk.NET.Maths;
 using Silk.NET.OpenGL.Legacy;
 using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 using Silk.NET.Windowing;
-using ImGuiNET;
 
 namespace CSharpSphere;
 
@@ -22,7 +21,7 @@ public static partial class Program
     {
         var options = WindowOptions.Default with
         {
-            Title = "Silk.NET Sphere",
+            Title = "Сфера",
             Size = new Vector2D<int>(1280, 720),
             API = new GraphicsAPI(
                 ContextAPI.OpenGL,
@@ -47,26 +46,9 @@ public static partial class Program
         OnResize(_window.Size);
     }
 
-    private static void ConfigureUi(int fontSize, float fontScale = 1.0f, float scale = 1.0f)
-    {
-        var fontConfig = new ImGuiFontConfig(
-            Path.Combine(AppContext.BaseDirectory, "fonts", "Better VCR 6.1.ttf"),
-            fontSize,
-            io => io.Fonts.GetGlyphRangesCyrillic());
-
-        _controller = new ImGuiController(_gl, _window, _input, fontConfig);
-        ImGui.GetIO().FontGlobalScale = fontScale;
-        ImGui.GetStyle().ScaleAllSizes(scale);
-        ImGui.StyleColorsClassic();
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
-        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
-        ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
-    }
-
     /// <summary>
-    ///     Очищает область отрисовки заливая её цветом <see cref="GL.ClearColor(float, float, float, float)" />. <br />
-    ///     Очищает буфер цвета методом <see cref="GL.Clear(ClearBufferMask)" />. <br />
-    ///     Отрисовывает сферу и интерфейс пользователя.
+    ///     Очищает область отрисовки, заливая её сплошным цветом. 
+    ///     Очищает буфер цвета. Отрисовывает сферу и интерфейс пользователя.
     /// </summary>
     /// <seealso href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glClear.xhtml">
     ///     glClear и ClearBufferMask
@@ -100,8 +82,9 @@ public static partial class Program
     }
 
     /// <summary>
-    ///     С учетом ширины и высоты Viewport задает новую матрицу ортографической проекции.
-    ///     Таким образом сфера всегда отображается круглой и не растягивается вместе с окном
+    ///     Задает видимую область так, чтобы сфера всегда была круглой. Если ширина окна 
+    ///     больше высоты, увеличивает отступы по бокам. В ином случае увеличивает отступы 
+    ///     сверху и снизу. Область отступов отсекается во время рендера.
     /// </summary>
     /// <param name="w">ширина</param>
     /// <param name="h">высота</param>

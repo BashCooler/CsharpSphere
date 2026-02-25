@@ -1,5 +1,5 @@
-using System.Numerics;
 using ImGuiNET;
+using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 
 namespace CSharpSphere;
 
@@ -9,7 +9,6 @@ public static partial class Program
     {
         _controller.Update((float)deltaTime);
         
-        ImGui.End();
         ImGui.Begin("Параметры сферы");
         ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
         
@@ -29,7 +28,24 @@ public static partial class Program
         
         ImGui.Text(Sphere.Messenger.Message);
         
-        
+        ImGui.End();
         _controller.Render();
+    }
+    
+    private static void ConfigureUi(int fontSize, float fontScale = 1.0f, float scale = 1.0f)
+    {
+        var fontConfig = new ImGuiFontConfig(
+            Path.Combine(AppContext.BaseDirectory, "fonts", "Better VCR 6.1.ttf"),
+            fontSize,
+            io => io.Fonts.GetGlyphRangesCyrillic());
+
+        _controller = new ImGuiController(_gl, _window, _input, fontConfig);
+        
+        ImGui.GetIO().FontGlobalScale = fontScale;
+        ImGui.GetStyle().ScaleAllSizes(scale);
+        ImGui.StyleColorsClassic();
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
+        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
+        ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 }

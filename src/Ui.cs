@@ -9,6 +9,7 @@ public static partial class Program
     {
         _controller.Update((float)deltaTime);
         
+        ImGui.End();
         ImGui.Begin("Параметры сферы");
         ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
         
@@ -28,7 +29,7 @@ public static partial class Program
         
         ImGui.Text(Sphere.Messenger.Message);
         
-        ImGui.End();
+        
         _controller.Render();
     }
 }

@@ -57,6 +57,10 @@ public static partial class Program
         _controller = new ImGuiController(_gl, _window, _input, fontConfig);
         ImGui.GetIO().FontGlobalScale = fontScale;
         ImGui.GetStyle().ScaleAllSizes(scale);
+        ImGui.StyleColorsClassic();
+        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
+        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
+        ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 
     /// <summary>

@@ -32,7 +32,6 @@ public static partial class Program
         };
         _window = Window.Create(options);
         _window.Load += OnLoad;
-        _window.Update += OnUpdate;
         _window.Render += OnRender;
         _window.FramebufferResize += OnResize;
         _window.Closing += OnClose;
@@ -44,11 +43,11 @@ public static partial class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        ConfigureUI(18, 1.0f, 1.0f);  // 1920x1080
+        ConfigureUi(18);
         OnResize(_window.Size);
     }
 
-    private static void ConfigureUI(int fontSize, float fontScale, float scale)
+    private static void ConfigureUi(int fontSize, float fontScale = 1.0f, float scale = 1.0f)
     {
         var fontConfig = new ImGuiFontConfig(
             Path.Combine(AppContext.BaseDirectory, "fonts", "JetBrainsMonoNL-Regular.ttf"),
@@ -59,8 +58,6 @@ public static partial class Program
         ImGui.GetIO().FontGlobalScale = fontScale;
         ImGui.GetStyle().ScaleAllSizes(scale);
     }
-
-    private static void OnUpdate(double deltaTime) { }
 
     /// <summary>
     ///     Очищает область отрисовки заливая её цветом <see cref="GL.ClearColor(float, float, float, float)" />. <br />

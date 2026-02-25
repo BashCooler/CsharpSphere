@@ -14,28 +14,21 @@ public static partial class Program
         
         ImGui.Text("Радиус");
         ImGui.SliderFloat("##R", ref Sphere.Radius, 0.0f, 5.0f);
+        ImGui.Separator();
         
-        Separator();
-        ImGui.Text("Максимум U, V");
+        ImGui.Text("\nМаксимум U, V");
         ImGui.SliderFloat("##UMax", ref Sphere.UMax, 0.0f, 2 * MathF.PI);
         ImGui.SliderFloat("##VMax", ref Sphere.VMax, 0.0f, MathF.PI);
+        ImGui.Separator();
         
-        Separator();
-        ImGui.Text("Разбиения U, V");
+        ImGui.Text("\nРазбиения U, V");
         ImGui.SliderInt("##U", ref Sphere.UDiv, 0, 100);
         ImGui.SliderInt("##V", ref Sphere.VDiv, 0, 100);
+        ImGui.Separator();
         
-        Separator();
         ImGui.Text(Sphere.Messenger.Message);
         
         ImGui.End();
         _controller.Render();
-    }
-
-    private static void Separator()
-    {
-        ImGui.Dummy(new Vector2(0, 10));
-        ImGui.Separator();
-        ImGui.Dummy(new Vector2(0, 10));
     }
 }

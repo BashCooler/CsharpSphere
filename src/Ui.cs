@@ -1,4 +1,5 @@
 using ImGuiNET;
+using Silk.NET.Input;
 using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 
 namespace CSharpSphere;
@@ -9,21 +10,27 @@ public static partial class Program
     {
         _controller.Update((float)deltaTime);
         
+        var io = ImGui.GetIO();
+        var keyboard = _input.Keyboards[0];
+        io.AddKeyEvent(
+            ImGuiKey.ModCtrl, 
+            keyboard.IsKeyPressed(Key.ControlLeft) || keyboard.IsKeyPressed(Key.ControlRight));
+        
         ImGui.Begin("Параметры сферы");
         ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
         
         ImGui.Text("Радиус");
-        ImGui.SliderFloat("##R", ref Sphere.R, 0.0f, 5.0f);
+        SliderF("R", ref Sphere.R, 0.0f, 5.0f);
         ImGui.Separator();
         
         ImGui.Text("\nМаксимум U, V");
-        ImGui.SliderFloat("##UMax", ref Sphere.UMax, 0.0f, 2 * MathF.PI);
-        ImGui.SliderFloat("##VMax", ref Sphere.VMax, 0.0f, MathF.PI);
+        SliderF("UMax", ref Sphere.UMax, 0.0f, 2 * MathF.PI);
+        SliderF("VMax", ref Sphere.VMax, 0.0f, MathF.PI);
         ImGui.Separator();
         
         ImGui.Text("\nРазбиения U, V");
-        ImGui.SliderInt("##U", ref Sphere.UDiv, 0, 100);
-        ImGui.SliderInt("##V", ref Sphere.VDiv, 0, 100);
+        SliderI("U", ref Sphere.UDiv, 0, 100);
+        SliderI("V", ref Sphere.VDiv, 0, 100);
         ImGui.Separator();
         
         ImGui.Text(Sphere.Message);
@@ -31,7 +38,17 @@ public static partial class Program
         ImGui.End();
         _controller.Render();
     }
+
+    private static void SliderF(string label, ref float v, float vMin, float vMax)
+    {
+        ImGui.SliderFloat($"##{label}", ref v, vMin, vMax, "%.3f", ImGuiSliderFlags.AlwaysClamp);
+    }
     
+    private static void SliderI(string label, ref int v, int vMin, int vMax)
+    {
+        ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", ImGuiSliderFlags.AlwaysClamp);
+    }
+
     private static void ConfigureUi(int fontSize, float fontScale = 1.0f, float scale = 1.0f)
     {
         var fontConfig = new ImGuiFontConfig(

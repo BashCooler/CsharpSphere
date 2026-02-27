@@ -22,20 +22,21 @@ public class Sphere
         
         for (int row = 0; row < VDiv + 1; row++)
         {
-            float v = (float)row / VDiv * VMax;
+            var v = (float)row / VDiv * VMax;
 
             float sinV = MathF.Sin(v);
+            float cosV = MathF.Cos(v);
 
             for (int col = 0; col < UDiv + 1; col++)
             {
-                float u = (float)col / UDiv * UMax;
+                var u = (float)col / UDiv * UMax;
 
                 float sinU = MathF.Sin(u);
                 float cosU = MathF.Cos(u);
 
                 float x = Radius * cosU * sinV;
-                float y = Radius * sinU * sinV;
-                float z = Radius * cosU;
+                float y = Radius * cosV;
+                float z = Radius * sinU * sinV;
                 
                 points[row, col] = new Vector3(x, y, z);
             }

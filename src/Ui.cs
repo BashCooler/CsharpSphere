@@ -13,7 +13,7 @@ public static partial class Program
         ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
         
         ImGui.Text("Радиус");
-        ImGui.SliderFloat("##R", ref Sphere.Radius, 0.0f, 5.0f);
+        ImGui.SliderFloat("##R", ref Sphere.R, 0.0f, 5.0f);
         ImGui.Separator();
         
         ImGui.Text("\nМаксимум U, V");
@@ -26,7 +26,7 @@ public static partial class Program
         ImGui.SliderInt("##V", ref Sphere.VDiv, 0, 100);
         ImGui.Separator();
         
-        ImGui.Text(Sphere.Messenger.Message);
+        ImGui.Text(Sphere.Message);
         
         ImGui.End();
         _controller.Render();

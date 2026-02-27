@@ -8,13 +8,13 @@ namespace CSharpSphere;
 
 public class Sphere
 {
-    public float Radius = 1.0f;
+    public float R = 1.0f;
     public float UMax = 2 * MathF.PI;
     public float VMax = MathF.PI;
     public int UDiv = 20;
     public int VDiv = 20;
     
-    public readonly Messenger Messenger = new();
+    public string Message = "";
 
     private Vector3[,] GeneratePoints()
     {
@@ -34,9 +34,9 @@ public class Sphere
                 float sinU = MathF.Sin(u);
                 float cosU = MathF.Cos(u);
 
-                float x = Radius * cosU * sinV;
-                float y = Radius * cosV;
-                float z = Radius * sinU * sinV;
+                float x = R * cosU * sinV;
+                float y = R * cosV;
+                float z = R * sinU * sinV;
                 
                 points[row, col] = new Vector3(x, y, z);
             }
@@ -102,9 +102,9 @@ public class Sphere
         gl.Color3(0.8f, 0.8f, 0.8f);
         foreach (var tri in triangles)
         {
-            var p1 = points[tri.Point1.Row, tri.Point1.Col];
-            var p2 = points[tri.Point2.Row, tri.Point2.Col];
-            var p3 = points[tri.Point3.Row, tri.Point3.Col];
+            var p1 = points[tri.Point1.I, tri.Point1.J];
+            var p2 = points[tri.Point2.I, tri.Point2.J];
+            var p3 = points[tri.Point3.I, tri.Point3.J];
             
             gl.Vertex2(p1.X * scale, p1.Y * scale);
             gl.Vertex2(p2.X * scale, p2.Y * scale);
@@ -117,7 +117,7 @@ public class Sphere
         }
         gl.End();
         
-        Messenger.Update(watch.ElapsedMilliseconds);
+        Message = $"\nВремя кадра: {watch.ElapsedMilliseconds} ms";
         watch.Stop();
     }
 }

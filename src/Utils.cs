@@ -11,26 +11,11 @@ public struct Triangle((int, int) point1, (int, int) point2, (int, int) point3)
 
 public readonly struct Indexer(int i, int j)
 {
-    public readonly int Row = i;
-    public readonly int Col = j;
+    public readonly int I = i;
+    public readonly int J = j;
 
     public override string ToString()
     {
-        return $"({Row}, {Col})";
-    }
-}
-
-public class Messenger
-{
-    public string Message = "";
-    
-    private readonly char[] spinner = { '|', '/', '-', '\\' };
-    private int s = 0;
-
-    public void Update(long ms)
-    {
-        // Message = $"\n{spinner[s]} Drawn sphere, took {ms} ms";
-        Message = $"\nВремя кадра: {ms} ms";
-        // s += 1; if (s > 3) s = 0;
+        return $"({I}, {J})";
     }
 }

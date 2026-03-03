@@ -16,6 +16,13 @@ public class Sphere
     
     public string Message = "";
 
+    /// <summary>
+    ///     Составляет массив точек сферы
+    /// </summary>
+    /// <returns>2D массив точек <see cref="Vector3" /></returns>
+    /// <seealso href="https://ps-group.github.io/opengl/lesson_11#wow1">
+    ///     UV-параметризация сферы
+    /// </seealso>
     private Vector3[,] GeneratePoints()
     {
         var points =  new Vector3[VDiv + 1, UDiv + 1];

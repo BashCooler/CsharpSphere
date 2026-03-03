@@ -1,5 +1,4 @@
 using ImGuiNET;
-using Silk.NET.Input;
 using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 
 namespace CSharpSphere;
@@ -26,7 +25,6 @@ public static partial class Program
     private static void RenderUi(double deltaTime)
     {
         _controller.Update((float)deltaTime);
-        // ExpectCtrlClick();
         
         ImGui.Begin("Параметры сферы");
         ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
@@ -67,19 +65,5 @@ public static partial class Program
     {
         if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
             ImGui.SetKeyboardFocusHere(-1);
-    }
-
-    /// <summary>
-    /// Вызвать после <c>ImGuiController.Update();</c> для включения оригинального
-    /// поведения Ctrl+ЛКМ для ввода
-    /// </summary>
-    [Obsolete]
-    private static void ExpectCtrlClick()
-    {
-        var io = ImGui.GetIO();
-        var keyboard = _input.Keyboards[0];
-        io.AddKeyEvent(
-            ImGuiKey.ModCtrl, 
-            keyboard.IsKeyPressed(Key.ControlLeft) || keyboard.IsKeyPressed(Key.ControlRight));
     }
 }

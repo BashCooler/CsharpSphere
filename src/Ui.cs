@@ -8,6 +8,8 @@ namespace CSharpSphere;
 
 public class Gui
 {
+    private const ImGuiSliderFlags Flag = ImGuiSliderFlags.AlwaysClamp;
+    
     private readonly Sphere _sphere;
     private readonly IInputContext _input;
     private readonly ImGuiController _controller;
@@ -34,17 +36,18 @@ public class Gui
     }
 
     private int _initialX;
+    private int _initialY;
+    private int _initialZ;
     private int _deltaX;
-    
+    private int _deltaY;
+    private int _deltaZ;
+    private bool _hoverX;
+    private bool _hoverY;
+    private bool _hoverZ;
 
     public void RenderUi(double deltaTime)
     {
         _controller.Update((float)deltaTime);
-        
-        // TODO ползунки должны сбрасываться
-        // то есть после каждого преобразования
-        // мы как будто нажимаем Apply All Transforms в Blender
-        // Но это для поворотов именно
         
         ImGui.Begin("Параметры сферы");
         ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
@@ -65,31 +68,9 @@ public class Gui
         ImGui.Separator();
         
         ImGui.Text("\nПоворот по X, Y, Z");
-        ImGui.DragInt("##AngleX", ref _deltaX, 1, -180, 180, "%d", ImGuiSliderFlags.AlwaysClamp);
-        if (ImGui.IsItemHovered())
-        {
-            _input.Mice[0].Cursor.StandardCursor = StandardCursor.HResize;
-        }
-        else
-        {
-            _input.Mice[0].Cursor.StandardCursor = StandardCursor.Arrow;
-        }
-        if (ImGui.IsItemActivated())
-        {
-            _initialX = _sphere.AngleX;
-        }
-        if (ImGui.IsItemActive())
-        {
-            _sphere.AngleX = _initialX + _deltaX;
-        }
-        if (ImGui.IsItemDeactivated())
-        {
-            _sphere.AngleX = (_initialX + _deltaX) % 360;
-            _deltaX = 0;
-        }
-        
-        // SliderI("AngleY", ref _angleY, -180, 180, () => _sphere.rotate(0, _angleY, 0));
-        // SliderI("AngleZ", ref _angleZ, -180, 180, () => _sphere.rotate(0, 0, _angleZ));
+        DragAngle("AngleX", ref _deltaX, ref _sphere.AngleX, ref _initialX, ref _hoverX);
+        DragAngle("AngleY", ref _deltaY, ref _sphere.AngleY, ref _initialY, ref _hoverY);
+        DragAngle("AngleZ", ref _deltaZ, ref _sphere.AngleZ, ref _initialZ, ref _hoverZ);
         ImGui.Separator();
         
         ImGui.Text(_sphere.Message);
@@ -98,15 +79,46 @@ public class Gui
         _controller.Render();
     }
 
+    private void DragAngle(string name, ref int delta, ref int angle, ref int initial, ref bool hover)
+    {
+        int limit = Int32.MaxValue;
+        
+        ImGui.DragInt($"##{name}", ref delta, 1, -limit, limit, "%d", Flag);
+
+        SetHoverCursor(ref hover);
+
+        if (ImGui.IsItemActivated()) initial = angle;
+        if (ImGui.IsItemActive()) angle = initial + delta;
+        if (!ImGui.IsItemDeactivated()) return;
+        
+        angle = (initial + delta) % 360;
+        delta = 0;
+    }
+
+    private void SetHoverCursor(ref bool hover)
+    {
+        if (ImGui.IsItemHovered())
+        {
+            hover = true;
+            _input.Mice[0].Cursor.StandardCursor = StandardCursor.HResize;
+        }
+        if (hover && !ImGui.IsItemHovered())
+        {
+            _input.Mice[0].Cursor.StandardCursor = StandardCursor.Arrow;
+            hover = false;
+        }
+        hover = ImGui.IsItemHovered();
+    }
+
     private static void SliderF(string label, ref float v, float vMin, float vMax)
     {
-        ImGui.SliderFloat($"##{label}", ref v, vMin, vMax, "%.3f", ImGuiSliderFlags.AlwaysClamp);
+        ImGui.SliderFloat($"##{label}", ref v, vMin, vMax, "%.3f", Flag);
         AddDoubleClickToEditEvent();
     }
 
     private static void SliderI(string label, ref int v, int vMin, int vMax)
     {
-        var move = ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", ImGuiSliderFlags.AlwaysClamp);
+        ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
         AddDoubleClickToEditEvent();
     }
     

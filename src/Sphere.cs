@@ -13,9 +13,9 @@ public class Sphere
     public int UDiv = 20;
     public int VDiv = 20;
 
-    private int _angleX = 0;
-    private int _angleY = 0;
-    private int _angleZ = 0;
+    public int AngleX;
+    public int AngleY;
+    public int AngleZ;
     
     public string Message = "";
 
@@ -111,9 +111,9 @@ public class Sphere
         var result = new Vector4[VDiv + 1, UDiv + 1];
         
         var transformationMat =
-            Matrix4.Identity * Matrix4.GetRotateX(_angleX) 
-                             * Matrix4.GetRotateY(_angleY) 
-                             * Matrix4.GetRotateZ(_angleZ);
+            Matrix4.Identity * Matrix4.GetRotateX(AngleX) 
+                             * Matrix4.GetRotateY(AngleY) 
+                             * Matrix4.GetRotateZ(AngleZ);
         
         for (int row = 0; row < VDiv + 1; row++)
         {
@@ -143,15 +143,5 @@ public class Sphere
             gl.Vertex2(p3.X * scale, p3.Y * scale);
             gl.Vertex2(p1.X * scale, p1.Y * scale);
         }
-    }
-
-    public void rotate(int dx, int dy, int dz)
-    {
-        _angleX = dx;
-        _angleY = dy;
-        _angleZ = dz;
-        _angleX %= 360;
-        _angleY %= 360;
-        _angleZ %= 360;
     }
 }

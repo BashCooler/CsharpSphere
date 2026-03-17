@@ -8,12 +8,14 @@ namespace CSharpSphere;
 
 public class Gui
 {
-    private static Sphere _sphere = null!;
-    private static ImGuiController _controller = null!;
+    private readonly Sphere _sphere;
+    private readonly IInputContext _input;
+    private readonly ImGuiController _controller;
 
     public Gui(GL gl, IWindow window, IInputContext input, Sphere sphere,
         int fontSize, float fontScale = 1.0f, float scale = 1.0f)
     {
+        _input = input;
         _sphere = sphere;
         
         var fontConfig = new ImGuiFontConfig(
@@ -31,7 +33,9 @@ public class Gui
         ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 
-    private int _angleX, _angleY, _angleZ;
+    private int _initialX;
+    private int _deltaX;
+    
 
     public void RenderUi(double deltaTime)
     {
@@ -61,9 +65,31 @@ public class Gui
         ImGui.Separator();
         
         ImGui.Text("\nПоворот по X, Y, Z");
-        SliderI("AngleX", ref _angleX, -180, 180, () => _sphere.rotate(_angleX, 0, 0));
-        SliderI("AngleY", ref _angleY, -180, 180, () => _sphere.rotate(0, _angleY, 0));
-        SliderI("AngleZ", ref _angleZ, -180, 180, () => _sphere.rotate(0, 0, _angleZ));
+        ImGui.DragInt("##AngleX", ref _deltaX, 1, -180, 180, "%d", ImGuiSliderFlags.AlwaysClamp);
+        if (ImGui.IsItemHovered())
+        {
+            _input.Mice[0].Cursor.StandardCursor = StandardCursor.HResize;
+        }
+        else
+        {
+            _input.Mice[0].Cursor.StandardCursor = StandardCursor.Arrow;
+        }
+        if (ImGui.IsItemActivated())
+        {
+            _initialX = _sphere.AngleX;
+        }
+        if (ImGui.IsItemActive())
+        {
+            _sphere.AngleX = _initialX + _deltaX;
+        }
+        if (ImGui.IsItemDeactivated())
+        {
+            _sphere.AngleX = (_initialX + _deltaX) % 360;
+            _deltaX = 0;
+        }
+        
+        // SliderI("AngleY", ref _angleY, -180, 180, () => _sphere.rotate(0, _angleY, 0));
+        // SliderI("AngleZ", ref _angleZ, -180, 180, () => _sphere.rotate(0, 0, _angleZ));
         ImGui.Separator();
         
         ImGui.Text(_sphere.Message);
@@ -78,10 +104,9 @@ public class Gui
         AddDoubleClickToEditEvent();
     }
 
-    private static void SliderI(string label, ref int v, int vMin, int vMax, Action? action = null)
+    private static void SliderI(string label, ref int v, int vMin, int vMax)
     {
         var move = ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", ImGuiSliderFlags.AlwaysClamp);
-        if (move) action?.Invoke();
         AddDoubleClickToEditEvent();
     }
     

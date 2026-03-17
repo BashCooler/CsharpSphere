@@ -43,6 +43,12 @@ public static partial class Program
         SliderI("V", ref Sphere.VDiv, 0, 100);
         ImGui.Separator();
         
+        ImGui.Text("\nПоворот по X, Y, Z");
+        SliderF("angleX", ref Sphere.angleX, -180, 180);
+        SliderF("angleY", ref Sphere.angleY, -180, 180);
+        SliderF("angleZ", ref Sphere.angleZ, -180, 180);
+        ImGui.Separator();
+        
         ImGui.Text(Sphere.Message);
         
         ImGui.End();

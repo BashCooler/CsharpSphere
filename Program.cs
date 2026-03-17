@@ -55,11 +55,32 @@ public static partial class Program
     /// </seealso>
     private static void OnRender(double deltaTime)
     {
+        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        _gl.Clear(ClearBufferMask.ColorBufferBit);
-        
+        DrawAxes();
         Sphere.DrawWireframeSphere(_gl);
         RenderUi(deltaTime);
+    }
+
+    private static void DrawAxes()
+    {
+        _gl.LineWidth(3f);
+        _gl.Begin(GLEnum.Lines);
+        
+        const int l = 1;
+        
+        // X
+        _gl.Color3(0.8f, 0f, 0f);
+        _gl.Vertex2(0, 0);
+        _gl.Vertex2(l, 0);
+        
+        // Y
+        _gl.Color3(0f, 0.8f, 0f);
+        _gl.Vertex2(0, 0);
+        _gl.Vertex2(0, l);
+        
+        _gl.End();
+        _gl.LineWidth(1.0f);
     }
 
     /// <summary>

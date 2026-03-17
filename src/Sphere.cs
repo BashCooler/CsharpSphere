@@ -13,12 +13,34 @@ public class Sphere
     public int UDiv = 20;
     public int VDiv = 20;
 
-    public float angleX = 0f;
-    public float angleY = 0f;
-    public float angleZ = 0f;
+    private int _angleX = 0;
+    private int _angleY = 0;
+    private int _angleZ = 0;
     
     public string Message = "";
 
+
+    /// <seealso href="https://registry.khronos.org/OpenGL/specs/gl/glspec30.pdf#subsection.2.6.1">
+    ///     Спецификация OpenGL 3.0
+    /// </seealso>
+    public void DrawWireframeSphere(GL gl)
+    {
+        var watch = Stopwatch.StartNew();
+
+        Vector4[,] points = GeneratePoints();
+        Vector4[,] transformedPoints = Transform(points);
+        Triangle[] triangles = GenerateTriangles(transformedPoints);
+        
+        gl.Begin(GLEnum.Lines);
+        gl.Color3(0.6f, 0.6f, 0.6f);
+        DrawLines(gl, triangles, transformedPoints, 0.85f);
+        gl.End();
+        
+        Message = $"\nВремя кадра: {watch.ElapsedMilliseconds} ms";
+        watch.Stop();
+    }
+    
+    
     /// <summary>
     ///     Составляет массив точек сферы
     /// </summary>
@@ -88,7 +110,10 @@ public class Sphere
     {
         var result = new Vector4[VDiv + 1, UDiv + 1];
         
-        var transformationMat = Matrix4.Identity * Matrix4.GetRotateX(angleX) * Matrix4.GetRotateY(angleY) * Matrix4.GetRotateZ(angleZ);
+        var transformationMat =
+            Matrix4.Identity * Matrix4.GetRotateX(_angleX) 
+                             * Matrix4.GetRotateY(_angleY) 
+                             * Matrix4.GetRotateZ(_angleZ);
         
         for (int row = 0; row < VDiv + 1; row++)
         {
@@ -101,38 +126,13 @@ public class Sphere
         return result;
     }
 
-    /// <summary>
-    ///     Вызывает методы <see cref="GeneratePoints" /> и <see cref="GenerateTriangles" /> для создания
-    ///     массива точек и массива треугольников. Выполняет отрисовку сферы посредством OpenGL.
-    ///     <list type="number">
-    ///         <item>Процесс начинается вызовом <see cref="GL.Begin(GLEnum)" /></item>
-    ///         <item>
-    ///             Происходит отрисовка линий <see cref="GLEnum.Lines" /> между вершинами треугольников.
-    ///             Вершины (точки) задаются методом <see cref="GL.Vertex2(float, float)" />
-    ///         </item>
-    ///         <item>Процесс завершается командой <see cref="GL.End" /></item>
-    ///     </list>
-    /// </summary>
-    /// <seealso href="https://registry.khronos.org/OpenGL/specs/gl/glspec30.pdf#subsection.2.6.1">
-    ///     Спецификация OpenGL 3.0
-    /// </seealso>
-    public void DrawWireframeSphere(GL gl)
+    private static void DrawLines(GL gl, Triangle[] triangles, Vector4[,] points, float scale)
     {
-        var watch = Stopwatch.StartNew();
-
-        var points = GeneratePoints();
-        var transformedPoints = Transform(points);
-        var triangles = GenerateTriangles(transformedPoints);
-        
-        const float scale = 0.85f;
-        
-        gl.Begin(GLEnum.Lines);
-        gl.Color3(0.6f, 0.6f, 0.6f);
         foreach (var tri in triangles)
         {
-            var p1 = transformedPoints[tri.Point1.I, tri.Point1.J];
-            var p2 = transformedPoints[tri.Point2.I, tri.Point2.J];
-            var p3 = transformedPoints[tri.Point3.I, tri.Point3.J];
+            var p1 = points[tri.Point1.I, tri.Point1.J];
+            var p2 = points[tri.Point2.I, tri.Point2.J];
+            var p3 = points[tri.Point3.I, tri.Point3.J];
             
             gl.Vertex2(p1.X * scale, p1.Y * scale);
             gl.Vertex2(p2.X * scale, p2.Y * scale);
@@ -143,9 +143,15 @@ public class Sphere
             gl.Vertex2(p3.X * scale, p3.Y * scale);
             gl.Vertex2(p1.X * scale, p1.Y * scale);
         }
-        gl.End();
-        
-        Message = $"\nВремя кадра: {watch.ElapsedMilliseconds} ms";
-        watch.Stop();
+    }
+
+    public void rotate(int dx, int dy, int dz)
+    {
+        _angleX = dx;
+        _angleY = dy;
+        _angleZ = dz;
+        _angleX %= 360;
+        _angleY %= 360;
+        _angleZ %= 360;
     }
 }

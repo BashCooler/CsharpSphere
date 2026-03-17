@@ -2,18 +2,17 @@
 
 using Silk.NET.Input;
 using Silk.NET.Maths;
-using Silk.NET.OpenGL.Legacy;
-using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 using Silk.NET.Windowing;
+using Silk.NET.OpenGL.Legacy;
 
 namespace CSharpSphere;
 
-public static partial class Program
+public static class Program
 {
     private static GL _gl = null!;
     private static IWindow _window = null!;
     private static IInputContext _input = null!;
-    private static ImGuiController _controller = null!;
+    private static Gui _ui = null!;
     
     private static readonly Sphere Sphere = new();
     
@@ -42,7 +41,7 @@ public static partial class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        ConfigureUi(12);
+        _ui = new Gui(_gl, _window, _input, Sphere, 12);
         OnResize(_window.Size);
     }
 
@@ -57,12 +56,13 @@ public static partial class Program
     {
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        DrawAxes();
+        DrawAxesXY();
         Sphere.DrawWireframeSphere(_gl);
-        RenderUi(deltaTime);
+        DrawAxesZ();
+        _ui.RenderUi(deltaTime);
     }
 
-    private static void DrawAxes()
+    private static void DrawAxesXY()
     {
         _gl.LineWidth(3f);
         _gl.Begin(GLEnum.Lines);
@@ -81,6 +81,19 @@ public static partial class Program
         
         _gl.End();
         _gl.LineWidth(1.0f);
+    }
+
+    private static void DrawAxesZ()
+    {
+        _gl.PointSize(5f);
+        _gl.Begin(GLEnum.Points);
+        
+        // Z
+        _gl.Color3(0f, 0.2f, 0.8f);
+        _gl.Vertex3(0, 0, 0);
+        
+        _gl.End();
+        _gl.PointSize(1f);
     }
 
     /// <summary>
@@ -129,7 +142,7 @@ public static partial class Program
 
     private static void OnClose()
     {
-        _controller.Dispose();
+        _ui.Dispose();
         _input.Dispose();
         _gl.Dispose();
     }

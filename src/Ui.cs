@@ -1,18 +1,27 @@
 using ImGuiNET;
+using Silk.NET.Input;
+using Silk.NET.Windowing;
+using Silk.NET.OpenGL.Legacy;
 using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 
 namespace CSharpSphere;
 
-public static partial class Program
+public class Gui
 {
-    private static void ConfigureUi(int fontSize, float fontScale = 1.0f, float scale = 1.0f)
+    private static Sphere _sphere = null!;
+    private static ImGuiController _controller = null!;
+
+    public Gui(GL gl, IWindow window, IInputContext input, Sphere sphere,
+        int fontSize, float fontScale = 1.0f, float scale = 1.0f)
     {
+        _sphere = sphere;
+        
         var fontConfig = new ImGuiFontConfig(
             Path.Combine(AppContext.BaseDirectory, "fonts", "Better VCR 6.1.ttf"),
             fontSize,
             io => io.Fonts.GetGlyphRangesCyrillic());
-
-        _controller = new ImGuiController(_gl, _window, _input, fontConfig);
+        
+        _controller = new ImGuiController(gl, window, input, fontConfig);
         
         ImGui.GetIO().FontGlobalScale = fontScale;
         ImGui.GetStyle().ScaleAllSizes(scale);
@@ -21,35 +30,43 @@ public static partial class Program
         ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
         ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
-    
-    private static void RenderUi(double deltaTime)
+
+    private int _angleX, _angleY, _angleZ;
+
+    public void RenderUi(double deltaTime)
     {
         _controller.Update((float)deltaTime);
+        
+        // TODO ползунки должны сбрасываться
+        // то есть после каждого преобразования
+        // мы как будто нажимаем Apply All Transforms в Blender
+        // Но это для поворотов именно
         
         ImGui.Begin("Параметры сферы");
         ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
         
+        // TODO сделать понятные единицы измерения не 1, а например в пикселях
         ImGui.Text("Радиус");
-        SliderF("R", ref Sphere.R, 0.0f, 5.0f);
+        SliderF("R", ref _sphere.R, 0.0f, 5.0f);
         ImGui.Separator();
         
         ImGui.Text("\nМаксимум U, V");
-        SliderF("UMax", ref Sphere.UMax, 0.0f, 2 * MathF.PI);
-        SliderF("VMax", ref Sphere.VMax, 0.0f, MathF.PI);
+        SliderF("UMax", ref _sphere.UMax, 0.0f, 2 * MathF.PI);
+        SliderF("VMax", ref _sphere.VMax, 0.0f, MathF.PI);
         ImGui.Separator();
         
         ImGui.Text("\nРазбиения U, V");
-        SliderI("U", ref Sphere.UDiv, 0, 100);
-        SliderI("V", ref Sphere.VDiv, 0, 100);
+        SliderI("U", ref _sphere.UDiv, 0, 100);
+        SliderI("V", ref _sphere.VDiv, 0, 100);
         ImGui.Separator();
         
         ImGui.Text("\nПоворот по X, Y, Z");
-        SliderF("angleX", ref Sphere.angleX, -180, 180);
-        SliderF("angleY", ref Sphere.angleY, -180, 180);
-        SliderF("angleZ", ref Sphere.angleZ, -180, 180);
+        SliderI("AngleX", ref _angleX, -180, 180, () => _sphere.rotate(_angleX, 0, 0));
+        SliderI("AngleY", ref _angleY, -180, 180, () => _sphere.rotate(0, _angleY, 0));
+        SliderI("AngleZ", ref _angleZ, -180, 180, () => _sphere.rotate(0, 0, _angleZ));
         ImGui.Separator();
         
-        ImGui.Text(Sphere.Message);
+        ImGui.Text(_sphere.Message);
         
         ImGui.End();
         _controller.Render();
@@ -61,9 +78,10 @@ public static partial class Program
         AddDoubleClickToEditEvent();
     }
 
-    private static void SliderI(string label, ref int v, int vMin, int vMax)
+    private static void SliderI(string label, ref int v, int vMin, int vMax, Action? action = null)
     {
-        ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", ImGuiSliderFlags.AlwaysClamp);
+        var move = ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", ImGuiSliderFlags.AlwaysClamp);
+        if (move) action?.Invoke();
         AddDoubleClickToEditEvent();
     }
     
@@ -72,4 +90,6 @@ public static partial class Program
         if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
             ImGui.SetKeyboardFocusHere(-1);
     }
+
+    public void Dispose() => _controller.Dispose();
 }

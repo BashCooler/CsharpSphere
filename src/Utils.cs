@@ -43,7 +43,7 @@ public struct Matrix4
         Mat = matrix;
     }
 
-    public static Matrix4 Identity => new Matrix4(new float[,]
+    public static Matrix4 Identity => new Matrix4(new[,]
     {
         {1f, 0f, 0f, 0f},
         {0f, 1f, 0f, 0f},
@@ -87,45 +87,42 @@ public struct Matrix4
             v.X * m.Mat[0, 3] + v.Y * m.Mat[1, 3] + v.Z * m.Mat[2, 3] + v.W * m.Mat[3, 3]);
     }
 
-    public static Matrix4 GetRotateX(float angle)
+    public static Matrix4 GetRotateX(int angle)
     {
         float cos = MathF.Cos(angle * MathF.PI / 180f);
         float sin = MathF.Sin(angle * MathF.PI / 180f);
-        var rotateX = new Matrix4(new float[,]
+        return new Matrix4(new[,]
         {
             {1f, 0f  , 0f  , 0f},
             {0f, cos , sin , 0f},
             {0f, -sin, cos , 0f},
             {0f, 0f  , 0f  , 1f}
         });
-        return rotateX;
     }
     
-    public static Matrix4 GetRotateY(float angle)
+    public static Matrix4 GetRotateY(int angle)
     {
         float cos = MathF.Cos(angle * MathF.PI / 180f);
         float sin = MathF.Sin(angle * MathF.PI / 180f);
-        var rotateX = new Matrix4(new float[,]
+        return new Matrix4(new[,]
         {
             {cos, 0f, -sin, 0f},
             {0f , 1f, 0f  , 0f},
             {sin, 0f, cos , 0f},
             {0f , 0f, 0f  , 1f}
         });
-        return rotateX;
     }
     
-    public static Matrix4 GetRotateZ(float angle)
+    public static Matrix4 GetRotateZ(int angle)
     {
         float cos = MathF.Cos(angle * MathF.PI / 180f);
         float sin = MathF.Sin(angle * MathF.PI / 180f);
-        var rotateX = new Matrix4(new float[,]
+        return new Matrix4(new[,]
         {
             {cos , sin, 0f, 0f},
             {-sin, cos, 0f  , 0f},
             {0f  , 0f , 1f , 0f},
             {0f  , 0f , 0f  , 1f}
         });
-        return rotateX;
     }
 }

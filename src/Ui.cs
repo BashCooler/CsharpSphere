@@ -35,9 +35,9 @@ public class Gui
         ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 
-    private int _initialX;
-    private int _initialY;
-    private int _initialZ;
+    private Matrix4 _initialX;
+    private Matrix4 _initialY;
+    private Matrix4 _initialZ;
     private int _deltaX;
     private int _deltaY;
     private int _deltaZ;
@@ -68,9 +68,9 @@ public class Gui
         ImGui.Separator();
         
         ImGui.Text("\nПоворот по X, Y, Z");
-        DragAngle("AngleX", ref _deltaX, ref _sphere.AngleX, ref _initialX, ref _hoverX);
-        DragAngle("AngleY", ref _deltaY, ref _sphere.AngleY, ref _initialY, ref _hoverY);
-        DragAngle("AngleZ", ref _deltaZ, ref _sphere.AngleZ, ref _initialZ, ref _hoverZ);
+        DragAngle("AngleX", ref _deltaX, ref _initialX, ref _hoverX, Matrix4.GetRotateX);
+        DragAngle("AngleY", ref _deltaY, ref _initialY, ref _hoverY, Matrix4.GetRotateY);
+        DragAngle("AngleZ", ref _deltaZ, ref _initialZ, ref _hoverZ, Matrix4.GetRotateZ);
         ImGui.Separator();
         
         ImGui.Text(_sphere.Message);
@@ -79,19 +79,23 @@ public class Gui
         _controller.Render();
     }
 
-    private void DragAngle(string name, ref int delta, ref int angle, ref int initial, ref bool hover)
+    private void DragAngle(string name, ref int delta, ref Matrix4 initial, ref bool hover,
+        Func<int, Matrix4> rotate)
     {
-        int limit = Int32.MaxValue;
+        const int limit = int.MaxValue;
         
         ImGui.DragInt($"##{name}", ref delta, 1, -limit, limit, "%d", Flag);
 
         SetHoverCursor(ref hover);
 
-        if (ImGui.IsItemActivated()) initial = angle;
-        if (ImGui.IsItemActive()) angle = initial + delta;
-        if (!ImGui.IsItemDeactivated()) return;
+        if (ImGui.IsItemActivated()) 
+            initial = _sphere.TransformationMat;
+        if (ImGui.IsItemActive()) 
+            _sphere.TransformationMat = initial * rotate(delta);
+        if (!ImGui.IsItemDeactivated()) 
+            return;
         
-        angle = (initial + delta) % 360;
+        initial = _sphere.TransformationMat;
         delta = 0;
     }
 

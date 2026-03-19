@@ -13,10 +13,8 @@ public class Sphere
     public int UDiv = 20;
     public int VDiv = 20;
 
-    public int AngleX;
-    public int AngleY;
-    public int AngleZ;
-    
+    public Matrix4 TransformationMat = Matrix4.Identity;
+
     public string Message = "";
 
 
@@ -110,20 +108,30 @@ public class Sphere
     {
         var result = new Vector4[VDiv + 1, UDiv + 1];
         
-        var transformationMat =
-            Matrix4.Identity * Matrix4.GetRotateX(AngleX) 
-                             * Matrix4.GetRotateY(AngleY) 
-                             * Matrix4.GetRotateZ(AngleZ);
-        
         for (int row = 0; row < VDiv + 1; row++)
         {
             for (int col = 0; col < UDiv + 1; col++)
             {
-                result[row, col] = points[row, col] * transformationMat;
+                result[row, col] = points[row, col] * TransformationMat;
             }
         }
         
         return result;
+    }
+
+    public void RotateX(int angle)
+    {
+        TransformationMat *= Matrix4.GetRotateX(angle);
+    }
+
+    public void RotateY(int angle)
+    {
+        TransformationMat *= Matrix4.GetRotateY(angle);
+    }
+
+    public void RotateZ(int angle)
+    {
+        TransformationMat *= Matrix4.GetRotateZ(angle);
     }
 
     private static void DrawLines(GL gl, Triangle[] triangles, Vector4[,] points, float scale)

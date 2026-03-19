@@ -1,8 +1,11 @@
+using System.Numerics;
 using ImGuiNET;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
 using Silk.NET.OpenGL.Legacy;
 using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
+
+using static ImGuiNET.ImGui;
 
 namespace CSharpSphere;
 
@@ -31,61 +34,75 @@ public class Gui
         
         _controller = new ImGuiController(gl, window, input, fontConfig);
         
-        ImGui.GetIO().FontGlobalScale = fontScale;
-        ImGui.GetStyle().ScaleAllSizes(scale);
-        ImGui.StyleColorsClassic();
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
-        ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
-        ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
+        GetIO().FontGlobalScale = fontScale;
+        GetStyle().ScaleAllSizes(scale);
+        StyleColorsClassic();
+        PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
+        PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
+        PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 
     public void RenderUi(double deltaTime)
     {
         _controller.Update((float)deltaTime);
+
+        float height = GetFontSize() * 30.5f;
+        SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
+        Begin("Параметры сферы");
         
-        ImGui.Begin("Параметры сферы");
-        ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
+        Group("1", () =>
+        {
+            SliderI("R, пиксель", ref _sphere.R, 0, 3000);
+        });
         
-        // TODO сделать понятные единицы измерения не 1, а например в пикселях
-        ImGui.Text("Радиус");
-        SliderF("R", ref _sphere.R, 0.0f, 5.0f);
-        ImGui.Separator();
+        Group("2", () =>
+        {
+            SliderI("Max U", ref _sphere.UMax, 0, 360);
+            SliderI("Мax V", ref _sphere.VMax, 0, 180);
+        });
         
-        ImGui.Text("\nМаксимум U, V");
-        SliderF("UMax", ref _sphere.UMax, 0.0f, 2 * MathF.PI);
-        SliderF("VMax", ref _sphere.VMax, 0.0f, MathF.PI);
-        ImGui.Separator();
+        Group("3", () =>
+        {
+            SliderI("Div U", ref _sphere.UDiv, 0, 100);
+            SliderI("Div V", ref _sphere.VDiv, 0, 100);
+        });
         
-        ImGui.Text("\nРазбиения U, V");
-        SliderI("U", ref _sphere.UDiv, 0, 100);
-        SliderI("V", ref _sphere.VDiv, 0, 100);
-        ImGui.Separator();
+        Group("4", () =>
+        {
+            Label("", "Поворот по X, Y, Z", "");
+            DragAngle("AngleX", ref _stateX, Matrix4.GetRotateX);
+            DragAngle("AngleY", ref _stateY, Matrix4.GetRotateY);
+            DragAngle("AngleZ", ref _stateZ, Matrix4.GetRotateZ);
+        });
         
-        ImGui.Text("\nПоворот по X, Y, Z");
-        DragAngle("AngleX", ref _stateX, Matrix4.GetRotateX);
-        DragAngle("AngleY", ref _stateY, Matrix4.GetRotateY);
-        DragAngle("AngleZ", ref _stateZ, Matrix4.GetRotateZ);
-        ImGui.Separator();
-        
-        ImGui.Text(_sphere.Message);
-        
-        ImGui.End();
+        End();
         _controller.Render();
+    }
+
+    private void Group(string name, Action content)
+    {
+        BeginChild(
+            name, 
+            new Vector2(0, 0), 
+            ImGuiChildFlags.Border | ImGuiChildFlags.AutoResizeY);
+        PushItemWidth(GetContentRegionAvail().X * 1.0f);
+        content();
+        EndChild();
     }
 
     private void DragAngle(string name, ref DragAngleState state, Func<int, Matrix4> transform)
     {
         const int limit = int.MaxValue;
         
-        ImGui.DragInt($"##{name}", ref state.Delta, 1, -limit, limit, "%d", Flag);
+        DragInt($"##{name}", ref state.Delta, 1, -limit, limit, "%d", Flag);
 
         SetHoverCursor(ref state.Hover);
 
-        if (ImGui.IsItemActivated()) 
+        if (IsItemActivated()) 
             state.Initial = _sphere.TransformationMat;
-        if (ImGui.IsItemActive()) 
+        if (IsItemActive()) 
             _sphere.TransformationMat = state.Initial * transform(state.Delta);
-        if (!ImGui.IsItemDeactivated()) 
+        if (!IsItemDeactivated()) 
             return;
         
         state.Initial = _sphere.TransformationMat;
@@ -94,35 +111,48 @@ public class Gui
 
     private void SetHoverCursor(ref bool hover)
     {
-        if (ImGui.IsItemHovered())
+        if (IsItemHovered())
         {
             hover = true;
             _input.Mice[0].Cursor.StandardCursor = StandardCursor.HResize;
         }
-        if (hover && !ImGui.IsItemHovered())
+        if (hover && !IsItemHovered())
         {
             _input.Mice[0].Cursor.StandardCursor = StandardCursor.Arrow;
             hover = false;
         }
-        hover = ImGui.IsItemHovered();
+        hover = IsItemHovered();
     }
 
     private static void SliderF(string label, ref float v, float vMin, float vMax)
     {
-        ImGui.SliderFloat($"##{label}", ref v, vMin, vMax, "%.3f", Flag);
+        Label($"{vMin}", label, $"{vMax}");
+        SliderFloat($"##{label}", ref v, vMin, vMax, "%.3f", Flag);
         AddDoubleClickToEditEvent();
     }
 
     private static void SliderI(string label, ref int v, int vMin, int vMax)
     {
-        ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
+        Label($"{vMin}", label, $"{vMax}");
+        SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
         AddDoubleClickToEditEvent();
+    }
+    
+    private static void Label(string left, string center, string right)
+    {
+        float maxWidth = GetContentRegionAvail().X;
+        float padding = GetStyle().WindowPadding.X;
+        Text(left);
+        SameLine((maxWidth - CalcTextSize(center).X) * 0.5f + padding); 
+        Text(center);
+        SameLine(maxWidth - CalcTextSize(right).X + padding); 
+        Text(right);
     }
     
     private static void AddDoubleClickToEditEvent()
     {
-        if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
-            ImGui.SetKeyboardFocusHere(-1);
+        if (IsItemHovered() && IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
+            SetKeyboardFocusHere(-1);
     }
 
     public void Dispose() => _controller.Dispose();

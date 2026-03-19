@@ -62,22 +62,41 @@ public static class Program
         _ui.RenderUi(deltaTime);
     }
 
+    public static void DrawLines(Triangle[] triangles, Vector4[,] points)
+    {
+        foreach (var tri in triangles)
+        {
+            var p1 = points[tri.Point1.I, tri.Point1.J];
+            var p2 = points[tri.Point2.I, tri.Point2.J];
+            var p3 = points[tri.Point3.I, tri.Point3.J];
+
+            int size = Math.Min(_window.Size.X, _window.Size.Y);
+            
+            _gl.Vertex2(p1.X / size, p1.Y / size);
+            _gl.Vertex2(p2.X / size, p2.Y / size);
+
+            _gl.Vertex2(p2.X / size, p2.Y / size);
+            _gl.Vertex2(p3.X / size, p3.Y / size);
+
+            _gl.Vertex2(p3.X / size, p3.Y / size);
+            _gl.Vertex2(p1.X / size, p1.Y / size);
+        }
+    }
+
     private static void DrawAxesXY()
     {
         _gl.LineWidth(3f);
         _gl.Begin(GLEnum.Lines);
         
-        const int l = 1;
-        
         // X
         _gl.Color3(0.8f, 0f, 0f);
         _gl.Vertex2(0, 0);
-        _gl.Vertex2(l, 0);
+        _gl.Vertex2(0.75f, 0);
         
         // Y
         _gl.Color3(0f, 0.8f, 0f);
         _gl.Vertex2(0, 0);
-        _gl.Vertex2(0, l);
+        _gl.Vertex2(0, 0.75f);
         
         _gl.End();
         _gl.LineWidth(1.0f);
@@ -122,21 +141,20 @@ public static class Program
     /// </summary>
     /// <param name="w">ширина</param>
     /// <param name="h">высота</param>
-    /// <param name="margin">отступ, определяет расстояние от края окна до сферы</param>
     /// <seealso href="https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glOrtho.xml">
     ///     Метод glOrtho
     /// </seealso>
-    private static void SetAspectRatio(int w, int h, float margin = 1.5f)
+    private static void SetAspectRatio(int w, int h)
     {
         float a = (float)w / h;
         
         if (a > 1.0f)
         {
-            _gl.Ortho(-margin * a, margin * a, -margin, margin, -10, 10);
+            _gl.Ortho(-1.0f * a, 1.0f * a, -1.0f, 1.0f, -10, 10);
         }
         else
         {
-            _gl.Ortho(-margin, margin, -margin / a, margin / a, -10, 10);
+            _gl.Ortho(-1.0f, 1.0f, -1.0f / a, 1.0f / a, -10, 10);
         }
     }
 

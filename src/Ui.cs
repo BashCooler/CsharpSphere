@@ -13,6 +13,10 @@ public class Gui
     private readonly Sphere _sphere;
     private readonly IInputContext _input;
     private readonly ImGuiController _controller;
+    
+    private DragAngleState _stateX;
+    private DragAngleState _stateY;
+    private DragAngleState _stateZ;
 
     public Gui(GL gl, IWindow window, IInputContext input, Sphere sphere,
         int fontSize, float fontScale = 1.0f, float scale = 1.0f)
@@ -34,16 +38,6 @@ public class Gui
         ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
         ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
-
-    private Matrix4 _initialX;
-    private Matrix4 _initialY;
-    private Matrix4 _initialZ;
-    private int _deltaX;
-    private int _deltaY;
-    private int _deltaZ;
-    private bool _hoverX;
-    private bool _hoverY;
-    private bool _hoverZ;
 
     public void RenderUi(double deltaTime)
     {
@@ -68,9 +62,9 @@ public class Gui
         ImGui.Separator();
         
         ImGui.Text("\nПоворот по X, Y, Z");
-        DragAngle("AngleX", ref _deltaX, ref _initialX, ref _hoverX, Matrix4.GetRotateX);
-        DragAngle("AngleY", ref _deltaY, ref _initialY, ref _hoverY, Matrix4.GetRotateY);
-        DragAngle("AngleZ", ref _deltaZ, ref _initialZ, ref _hoverZ, Matrix4.GetRotateZ);
+        DragAngle("AngleX", ref _stateX, Matrix4.GetRotateX);
+        DragAngle("AngleY", ref _stateY, Matrix4.GetRotateY);
+        DragAngle("AngleZ", ref _stateZ, Matrix4.GetRotateZ);
         ImGui.Separator();
         
         ImGui.Text(_sphere.Message);
@@ -79,24 +73,23 @@ public class Gui
         _controller.Render();
     }
 
-    private void DragAngle(string name, ref int delta, ref Matrix4 initial, ref bool hover,
-        Func<int, Matrix4> rotate)
+    private void DragAngle(string name, ref DragAngleState state, Func<int, Matrix4> transform)
     {
         const int limit = int.MaxValue;
         
-        ImGui.DragInt($"##{name}", ref delta, 1, -limit, limit, "%d", Flag);
+        ImGui.DragInt($"##{name}", ref state.Delta, 1, -limit, limit, "%d", Flag);
 
-        SetHoverCursor(ref hover);
+        SetHoverCursor(ref state.Hover);
 
         if (ImGui.IsItemActivated()) 
-            initial = _sphere.TransformationMat;
+            state.Initial = _sphere.TransformationMat;
         if (ImGui.IsItemActive()) 
-            _sphere.TransformationMat = initial * rotate(delta);
+            _sphere.TransformationMat = state.Initial * transform(state.Delta);
         if (!ImGui.IsItemDeactivated()) 
             return;
         
-        initial = _sphere.TransformationMat;
-        delta = 0;
+        state.Initial = _sphere.TransformationMat;
+        state.Delta = 0;
     }
 
     private void SetHoverCursor(ref bool hover)
@@ -133,4 +126,12 @@ public class Gui
     }
 
     public void Dispose() => _controller.Dispose();
+
+    private struct DragAngleState
+    {
+        public Matrix4 Initial;
+        public int Delta;
+        public bool Hover;
+    }
 }
+

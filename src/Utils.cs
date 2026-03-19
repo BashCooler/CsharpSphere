@@ -43,7 +43,7 @@ public struct Matrix4
         Mat = matrix;
     }
 
-    public static Matrix4 Identity => new Matrix4(new[,]
+    public static Matrix4 Identity => new(new[,]
     {
         {1f, 0f, 0f, 0f},
         {0f, 1f, 0f, 0f},

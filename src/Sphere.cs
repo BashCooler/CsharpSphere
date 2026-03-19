@@ -119,21 +119,6 @@ public class Sphere
         return result;
     }
 
-    public void RotateX(int angle)
-    {
-        TransformationMat *= Matrix4.GetRotateX(angle);
-    }
-
-    public void RotateY(int angle)
-    {
-        TransformationMat *= Matrix4.GetRotateY(angle);
-    }
-
-    public void RotateZ(int angle)
-    {
-        TransformationMat *= Matrix4.GetRotateZ(angle);
-    }
-
     private static void DrawLines(GL gl, Triangle[] triangles, Vector4[,] points, float scale)
     {
         foreach (var tri in triangles)

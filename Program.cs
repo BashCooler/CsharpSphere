@@ -74,18 +74,18 @@ public static class Program
             var p2 = points[tri.Point2.I, tri.Point2.J];
             var p3 = points[tri.Point3.I, tri.Point3.J];
             
-            DrawLine(p1, p2, _windowMinSize);
-            DrawLine(p2, p3, _windowMinSize);
-            DrawLine(p3, p1, _windowMinSize);
+            DrawLine(p1, p2);
+            DrawLine(p2, p3);
+            DrawLine(p3, p1);
         }
         
         _gl.End();
     }
 
-    private static void DrawLine(Vector4 p1, Vector4 p2,  int size)
+    private static void DrawLine(Vector4 p1, Vector4 p2)
     {
-        _gl.Vertex2(p1.X / size, p1.Y / size);
-        _gl.Vertex2(p2.X / size, p2.Y / size);
+        _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
+        _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
     }
 
     private static void DrawAxesXY()

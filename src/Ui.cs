@@ -47,7 +47,7 @@ public class Gui
         _controller.Update((float)deltaTime);
 
         float height = GetFontSize() * 30.5f;
-        SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
+        SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(100, height));
         Begin("Параметры сферы");
         
         Group("1", () =>
@@ -63,8 +63,8 @@ public class Gui
         
         Group("3", () =>
         {
-            SliderI("Div U", ref _sphere.UDiv, 0, 100);
-            SliderI("Div V", ref _sphere.VDiv, 0, 100);
+            SliderI("Div U", ref _sphere.UDiv, 0, 1000);
+            SliderI("Div V", ref _sphere.VDiv, 0, 1000);
         });
         
         Group("4", () =>

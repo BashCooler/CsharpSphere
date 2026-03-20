@@ -1,7 +1,6 @@
 #pragma warning disable CS0618 // Type or member is obsolete
 
 using System.Diagnostics;
-using Silk.NET.OpenGL.Legacy;
 
 using static CSharpSphere.Program;
 
@@ -24,18 +23,19 @@ public class Sphere
     /// <seealso href="https://registry.khronos.org/OpenGL/specs/gl/glspec30.pdf#subsection.2.6.1">
     ///     Спецификация OpenGL 3.0
     /// </seealso>
-    public void DrawWireframeSphere(GL gl)
+    public void DrawWireframeSphere()
     {
         var watch = Stopwatch.StartNew();
 
         Vector4[,] points = GeneratePoints();
+        Console.WriteLine($"\nGenerated Points: {watch.ElapsedMilliseconds} ms");
         Vector4[,] transformedPoints = Transform(points);
+        Console.WriteLine($"Transformed Points: {watch.ElapsedMilliseconds} ms");
         Triangle[] triangles = GenerateTriangles(transformedPoints);
+        Console.WriteLine($"Generated Triangles: {watch.ElapsedMilliseconds} ms");
         
-        gl.Begin(GLEnum.Lines);
-        gl.Color3(0.6f, 0.6f, 0.6f);
         DrawLines(triangles, transformedPoints);
-        gl.End();
+        Console.WriteLine($"Drawn Lines: {watch.ElapsedMilliseconds} ms");
         
         Message = $"\nВремя кадра: {watch.ElapsedMilliseconds} ms";
         watch.Stop();
@@ -52,8 +52,8 @@ public class Sphere
     private Vector4[,] GeneratePoints()
     {
         var points =  new Vector4[VDiv + 1, UDiv + 1];
-        
-        for (int row = 0; row < VDiv + 1; row++)
+
+        Parallel.For(0, VDiv + 1, row =>
         {
             var v = (float)row / VDiv * (VMax * MathF.PI / 180f);
 
@@ -74,11 +74,26 @@ public class Sphere
                 
                 points[row, col] = new Vector4(x, y, z);
             }
-        }
+        });
         
         return points;
     }
 
+    private Vector4[,] Transform(Vector4[,] points)
+    {
+        var result = new Vector4[VDiv + 1, UDiv + 1];
+
+        Parallel.For(0, VDiv + 1, row =>
+        {
+            for (int col = 0; col < UDiv + 1; col++)
+            {
+                result[row, col] = points[row, col] * TransformationMat;
+            }
+        });
+        
+        return result;
+    }
+    
     private static Triangle[] GenerateTriangles(Vector4[,] points)
     {
         int cols = points.GetLength(1);
@@ -86,40 +101,25 @@ public class Sphere
         
         var triangles = new Triangle[2 * (rows - 1) * (cols - 1)];
 
-        var t = 0;
-        for (int i = 0; i < rows - 1; i++)
+        Parallel.For(0, rows - 1, i =>
         {
             for (int j = 0; j < cols - 1; j++)
             {
-                triangles[t] = new Triangle(
+                int index = 2 * (i * (cols - 1) + j);
+                
+                triangles[index] = new Triangle(
                     (i, j),
                     (i, j + 1),
                     (i + 1, j)
                 );
-                triangles[t + 1] = new Triangle(
+                triangles[index + 1] = new Triangle(
                     (i + 1, j + 1),
                     (i, j + 1),
                     (i + 1, j)
                 );
-                t += 2;
             }
-        }
+        });
         
         return triangles;
-    }
-
-    private Vector4[,] Transform(Vector4[,] points)
-    {
-        var result = new Vector4[VDiv + 1, UDiv + 1];
-        
-        for (int row = 0; row < VDiv + 1; row++)
-        {
-            for (int col = 0; col < UDiv + 1; col++)
-            {
-                result[row, col] = points[row, col] * TransformationMat;
-            }
-        }
-        
-        return result;
     }
 }

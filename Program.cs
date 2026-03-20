@@ -13,8 +13,9 @@ public static class Program
     private static IWindow _window = null!;
     private static IInputContext _input = null!;
     private static Gui _ui = null!;
-    
     private static readonly Sphere Sphere = new();
+
+    private static int _windowMinSize;
     
     public static void Main()
     {
@@ -72,20 +73,19 @@ public static class Program
             var p1 = points[tri.Point1.I, tri.Point1.J];
             var p2 = points[tri.Point2.I, tri.Point2.J];
             var p3 = points[tri.Point3.I, tri.Point3.J];
-
-            int size = Math.Min(_window.Size.X, _window.Size.Y);
             
-            _gl.Vertex2(p1.X / size, p1.Y / size);
-            _gl.Vertex2(p2.X / size, p2.Y / size);
-
-            _gl.Vertex2(p2.X / size, p2.Y / size);
-            _gl.Vertex2(p3.X / size, p3.Y / size);
-
-            _gl.Vertex2(p3.X / size, p3.Y / size);
-            _gl.Vertex2(p1.X / size, p1.Y / size);
+            DrawLine(p1, p2, _windowMinSize);
+            DrawLine(p2, p3, _windowMinSize);
+            DrawLine(p3, p1, _windowMinSize);
         }
         
         _gl.End();
+    }
+
+    private static void DrawLine(Vector4 p1, Vector4 p2,  int size)
+    {
+        _gl.Vertex2(p1.X / size, p1.Y / size);
+        _gl.Vertex2(p2.X / size, p2.Y / size);
     }
 
     private static void DrawAxesXY()
@@ -152,6 +152,7 @@ public static class Program
     private static void SetAspectRatio(int w, int h)
     {
         float a = (float)w / h;
+        _windowMinSize = Math.Min(w, h);
         
         if (a > 1.0f)
         {

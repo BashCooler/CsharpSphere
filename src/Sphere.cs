@@ -9,16 +9,17 @@ namespace CSharpSphere;
 public class Sphere
 {
     public int R = 700;
-    
     public int UMax = 360;
     public int VMax = 180;
     public int UDiv = 20;
-    public int VDiv = 20;
+    public int VDiv = 21;
+
+    private Vector4[,] _points = null!;
+    private Vector4[,] _transformedPoints = null!;
+    private Triangle[] _triangles = null!;
+    public bool Update = true;
 
     public Matrix4 TransformationMat = Matrix4.Identity;
-
-    public string Message = "";
-
 
     /// <seealso href="https://registry.khronos.org/OpenGL/specs/gl/glspec30.pdf#subsection.2.6.1">
     ///     Спецификация OpenGL 3.0
@@ -27,18 +28,18 @@ public class Sphere
     {
         var watch = Stopwatch.StartNew();
 
-        Vector4[,] points = GeneratePoints();
-        Console.WriteLine($"\nGenerated Points: {watch.ElapsedMilliseconds} ms");
-        Vector4[,] transformedPoints = Transform(points);
-        Console.WriteLine($"Transformed Points: {watch.ElapsedMilliseconds} ms");
-        Triangle[] triangles = GenerateTriangles(transformedPoints);
-        Console.WriteLine($"Generated Triangles: {watch.ElapsedMilliseconds} ms");
+        if (Update)
+        {
+            _points = GeneratePoints();
+            _triangles = GenerateTriangles(_points);
+            _transformedPoints = Transform(_points);
+            Update = false;
+            Console.WriteLine("Updated");
+        }
+        DrawLines(_triangles, _transformedPoints);
         
-        DrawLines(triangles, transformedPoints);
-        Console.WriteLine($"Drawn Lines: {watch.ElapsedMilliseconds} ms");
-        
-        Message = $"\nВремя кадра: {watch.ElapsedMilliseconds} ms";
         watch.Stop();
+        Console.WriteLine($"Drawn Lines: {watch.ElapsedMilliseconds} ms");
     }
     
     

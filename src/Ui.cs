@@ -47,32 +47,32 @@ public class Gui
         _controller.Update((float)deltaTime);
 
         float height = GetFontSize() * 30.5f;
-        SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(100, height));
+        SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
         Begin("Параметры сферы");
         
         Group("1", () =>
         {
-            SliderI("R, пиксель", ref _sphere.R, 0, 3000);
+            SliderI("R, пиксель", ref _sphere.R, 0, 3000, ref _sphere.Update);
         });
         
         Group("2", () =>
         {
-            SliderI("Max U", ref _sphere.UMax, 0, 360);
-            SliderI("Мax V", ref _sphere.VMax, 0, 180);
+            SliderI("Max U", ref _sphere.UMax, 0, 360, ref _sphere.Update);
+            SliderI("Мax V", ref _sphere.VMax, 0, 180, ref _sphere.Update);
         });
         
         Group("3", () =>
         {
-            SliderI("Div U", ref _sphere.UDiv, 0, 1000);
-            SliderI("Div V", ref _sphere.VDiv, 0, 1000);
+            SliderI("Div U", ref _sphere.UDiv, 0, 200, ref _sphere.Update);
+            SliderI("Div V", ref _sphere.VDiv, 0, 200, ref _sphere.Update);
         });
         
         Group("4", () =>
         {
             Label("", "Поворот по X, Y, Z", "");
-            DragAngle("AngleX", ref _stateX, Matrix4.GetRotateX);
-            DragAngle("AngleY", ref _stateY, Matrix4.GetRotateY);
-            DragAngle("AngleZ", ref _stateZ, Matrix4.GetRotateZ);
+            DragAngle("AngleX", ref _stateX, Matrix4.GetRotateX, ref _sphere.Update);
+            DragAngle("AngleY", ref _stateY, Matrix4.GetRotateY, ref _sphere.Update);
+            DragAngle("AngleZ", ref _stateZ, Matrix4.GetRotateZ, ref _sphere.Update);
         });
         
         End();
@@ -90,7 +90,7 @@ public class Gui
         EndChild();
     }
 
-    private void DragAngle(string name, ref DragAngleState state, Func<int, Matrix4> transform)
+    private void DragAngle(string name, ref DragAngleState state, Func<int, Matrix4> transform, ref bool update)
     {
         const int limit = int.MaxValue;
         
@@ -100,8 +100,11 @@ public class Gui
 
         if (IsItemActivated()) 
             state.Initial = _sphere.TransformationMat;
-        if (IsItemActive()) 
+        if (IsItemActive())
+        {
             _sphere.TransformationMat = state.Initial * transform(state.Delta);
+            update = true;
+        }
         if (!IsItemDeactivated()) 
             return;
         
@@ -124,17 +127,11 @@ public class Gui
         hover = IsItemHovered();
     }
 
-    private static void SliderF(string label, ref float v, float vMin, float vMax)
+    private static void SliderI(string label, ref int v, int vMin, int vMax, ref bool update)
     {
         Label($"{vMin}", label, $"{vMax}");
-        SliderFloat($"##{label}", ref v, vMin, vMax, "%.3f", Flag);
-        AddDoubleClickToEditEvent();
-    }
-
-    private static void SliderI(string label, ref int v, int vMin, int vMax)
-    {
-        Label($"{vMin}", label, $"{vMax}");
-        SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
+        bool active = SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
+        if (active) update = true;
         AddDoubleClickToEditEvent();
     }
     

@@ -42,7 +42,7 @@ public static class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        _ui = new Gui(_gl, _window, _input, Sphere, 12);
+        _ui = new Gui(_gl, _window, _input, Sphere, 18);
         OnResize(_window.Size);
     }
 
@@ -56,8 +56,8 @@ public static class Program
     private static void OnRender(double deltaTime)
     {
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        DrawAxesXY();
+        _gl.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        DrawAxesXy();
         Sphere.DrawWireframeSphere();
         DrawAxesZ();
         _ui.RenderUi(deltaTime);
@@ -66,7 +66,8 @@ public static class Program
     public static void DrawLines(Triangle[] triangles, Vector4[,] points)
     {
         _gl.Begin(GLEnum.Lines);
-        _gl.Color3(0.6f, 0.6f, 0.6f);
+        _gl.LineWidth(2f);
+        _gl.Color3(0.5f, 0.5f, 0.5f);
         
         foreach (var tri in triangles)
         {
@@ -88,7 +89,7 @@ public static class Program
         _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
     }
 
-    private static void DrawAxesXY()
+    private static void DrawAxesXy()
     {
         _gl.LineWidth(3f);
         _gl.Begin(GLEnum.Lines);

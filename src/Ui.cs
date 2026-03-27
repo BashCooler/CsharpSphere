@@ -36,7 +36,7 @@ public class Gui
         
         GetIO().FontGlobalScale = fontScale;
         GetStyle().ScaleAllSizes(scale);
-        StyleColorsClassic();
+        StyleColorsLight();
         PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
         PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
         PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
@@ -46,7 +46,7 @@ public class Gui
     {
         _controller.Update((float)deltaTime);
 
-        float height = GetFontSize() * 30.5f;
+        float height = GetFontSize() * 25.5f;
         SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
         Begin("Параметры сферы");
         

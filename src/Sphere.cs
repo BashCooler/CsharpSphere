@@ -34,12 +34,10 @@ public class Sphere
             _triangles = GenerateTriangles(_points);
             _transformedPoints = Transform(_points);
             Update = false;
-            Console.WriteLine("Updated");
         }
         DrawLines(_triangles, _transformedPoints);
         
         watch.Stop();
-        Console.WriteLine($"Drawn Lines: {watch.ElapsedMilliseconds} ms");
     }
     
     

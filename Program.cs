@@ -111,7 +111,7 @@ public static class Program
 
         foreach (Triangle tri in triangles)
         {
-            if (!tri.Front) return;
+            if (!tri.Front) continue;
             
             Vector4 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
             Vector4 p2 = points[tri.IdxP2.I, tri.IdxP2.J];

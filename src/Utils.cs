@@ -58,9 +58,11 @@ public struct Vector3(float x, float y, float z)
 
 public struct Color(float r, float g, float b)
 {
-    public readonly float R = r;
-    public readonly float G = g;
-    public readonly float B = b;
+    public System.Numerics.Vector3 Rgb = new(r, g, b);
+    
+    public float R => Rgb.X;
+    public float G => Rgb.Y;
+    public float B => Rgb.Z;
 
     public static Color operator *(Color c, float f)
     {

@@ -20,6 +20,8 @@ public class Gui
     private DragAngleState _stateX;
     private DragAngleState _stateY;
     private DragAngleState _stateZ;
+    private DragAngleState _stateOuterColor;
+    private DragAngleState _stateInnerColor;
 
     public Gui(GL gl, IWindow window, IInputContext input, Sphere sphere,
         int fontSize, float fontScale = 1.0f, float scale = 1.0f)
@@ -49,24 +51,24 @@ public class Gui
         // float height = GetFontSize() * 25.5f;
         // SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
         Begin("Параметры сферы");
-        
+
         Group("1", () =>
         {
             SliderI("R, пиксель", ref _sphere.R, 0, 3000, ref _sphere.Update);
         });
-        
+
         Group("2", () =>
         {
             SliderI("Max U", ref _sphere.UMax, 0, 360, ref _sphere.Update);
             SliderI("Мax V", ref _sphere.VMax, 0, 180, ref _sphere.Update);
         });
-        
+
         Group("3", () =>
         {
             SliderI("Div U", ref _sphere.UDiv, 0, 200, ref _sphere.Update);
             SliderI("Div V", ref _sphere.VDiv, 0, 200, ref _sphere.Update);
         });
-        
+
         Group("4", () =>
         {
             Label("", "Поворот по X, Y, Z", "");
@@ -83,6 +85,19 @@ public class Gui
 
             if (!_sphere.Shading) BeginDisabled();
             Checkbox("Отрисовка в 2 этапа", ref _sphere.TwoStep);
+            
+            Group("6", () =>
+            {
+                Label("", "Внешний цвет", "");
+                ColorEdit("OuterColor", ref _sphere.OuterColor.Rgb, ref _stateOuterColor, ref _sphere.Update);
+            });
+            
+            Group("7", () =>
+            {
+                Label("", "Внутренний цвет", "");
+                ColorEdit("InnerColor", ref _sphere.InnerColor.Rgb, ref _stateInnerColor, ref _sphere.Update);
+            });
+            
             if (!_sphere.Shading) EndDisabled();
         });
         
@@ -90,7 +105,7 @@ public class Gui
         _controller.Render();
     }
 
-    private void Group(string name, Action content)
+    private static void Group(string name, Action content)
     {
         BeginChild(
             name, 
@@ -99,6 +114,13 @@ public class Gui
         PushItemWidth(GetContentRegionAvail().X * 1.0f);
         content();
         EndChild();
+    }
+    
+    private void ColorEdit(string name, ref System.Numerics.Vector3 rgb, ref DragAngleState state, ref bool update)
+    {
+        ColorEdit3($"##{name}", ref rgb);
+        SetHoverCursor(ref state.Hover);
+        if (IsItemActive()) update = true;
     }
 
     private void DragAngle(string name, ref DragAngleState state, Func<int, Matrix4> transform, ref bool update)

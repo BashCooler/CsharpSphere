@@ -130,7 +130,7 @@ public class Sphere
 
     private void GenerateColors()
     {
-        var lightDirection = new Vector4(0f, 0f, 1f, 0f);
+        var lightPos = new Vector4(0f, 0f, 1f, 0f);
 
         for (int i = 0; i < _triangles.Length; i++)
         {
@@ -140,13 +140,13 @@ public class Sphere
                             _points[_triangles[i].IdxP3.I, _triangles[i].IdxP3.J]]);
             
             n = Vector4.Normalize(n);
-            float cos = n.X * lightDirection.X + n.Y * lightDirection.Y + n.Z * lightDirection.Z;
+            float cos = n.X * lightPos.X + n.Y * lightPos.Y + n.Z * lightPos.Z;
             cos = Math.Clamp(cos, -1f, 1f);
             
             if (cos >= 0)
                 _triangles[i].SetColor(OuterColor * cos);
             else
-                _triangles[i].SetColor(new Color(0, 0, 1f) * MathF.Abs(cos));
+                _triangles[i].SetColor(InnerColor * MathF.Abs(cos));
         }
     }
 

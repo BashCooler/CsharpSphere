@@ -3,14 +3,18 @@ using System.Diagnostics;
 namespace CSharpSphere;
 
 
-public class Triangle((int, int) point1, (int, int) point2, (int, int) point3)
+public class Triangle((int, int) p1, (int, int) p2, (int, int) p3)
 {
-    public VertexIndex IdxP1 = new(point1.Item1, point1.Item2);
-    public VertexIndex IdxP2 = new(point2.Item1, point2.Item2);
-    public VertexIndex IdxP3 = new(point3.Item1, point3.Item2);
+    private readonly VertexIndex _idxP1 = new(p1.Item1, p1.Item2);
+    private readonly VertexIndex _idxP2 = new(p2.Item1, p2.Item2);
+    private readonly VertexIndex _idxP3 = new(p3.Item1, p3.Item2);
     
     public Color Color;
     public bool Front = true;
+
+    public Vector3 GetP1(Vector3[,] points) => points[_idxP1.I, _idxP1.J];
+    public Vector3 GetP2(Vector3[,] points) => points[_idxP2.I, _idxP2.J];
+    public Vector3 GetP3(Vector3[,] points) => points[_idxP3.I, _idxP3.J];
     
     public Triangle SetColor(Color color)
     {

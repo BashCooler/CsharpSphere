@@ -73,9 +73,9 @@ public static class Program
         
         foreach (Triangle tri in triangles)
         {
-            Vector3 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
-            Vector3 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
-            Vector3 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            Vector3 p1 = tri.GetP1(points);
+            Vector3 p2 = tri.GetP2(points);
+            Vector3 p3 = tri.GetP3(points);
             
             DrawLine(p1, p2);
             DrawLine(p2, p3);
@@ -95,9 +95,9 @@ public static class Program
         {
             if (TwoStep && tri.Front) continue;
             
-            Vector3 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
-            Vector3 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
-            Vector3 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            Vector3 p1 = tri.GetP1(points);
+            Vector3 p2 = tri.GetP2(points);
+            Vector3 p3 = tri.GetP3(points);
             
             Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
@@ -120,9 +120,9 @@ public static class Program
         {
             if (!tri.Front) continue;
             
-            Vector3 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
-            Vector3 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
-            Vector3 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            Vector3 p1 = tri.GetP1(points);
+            Vector3 p2 = tri.GetP2(points);
+            Vector3 p3 = tri.GetP3(points);
             
             Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
@@ -223,15 +223,12 @@ public static class Program
     {
         float a = (float)w / h;
         _windowMinSize = Math.Min(w, h);
-        
-        if (a > 1.0f)
-        {
-            _gl.Ortho(-1.0f * a, 1.0f * a, -1.0f, 1.0f, -10, 10);
-        }
+
+        const float s = 1.0f;
+        if (a > s)
+            _gl.Ortho(-s * a, s * a, -s, s, -10, 10);
         else
-        {
-            _gl.Ortho(-1.0f, 1.0f, -1.0f / a, 1.0f / a, -10, 10);
-        }
+            _gl.Ortho(-s, s, -s / a, s / a, -10, 10);
     }
 
     private static void OnClose()

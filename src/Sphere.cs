@@ -134,10 +134,12 @@ public class Sphere
 
         foreach (Triangle tri in _triangles)
         {
-            Vector3 n = NewellNormal([
-                _points[tri.IdxP1.I, tri.IdxP1.J], 
-                _points[tri.IdxP2.I, tri.IdxP2.J], 
-                _points[tri.IdxP3.I, tri.IdxP3.J]]);
+            Vector3[] points = [
+                tri.GetP1(_points), 
+                tri.GetP2(_points), 
+                tri.GetP3(_points)];
+            
+            Vector3 n = NewellNormal(points);
             
             n = Vector3.Normalize(n);
             float cos = n.X * lightPos.X + n.Y * lightPos.Y + n.Z * lightPos.Z;

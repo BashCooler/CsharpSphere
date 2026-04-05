@@ -20,8 +20,8 @@ public class Sphere
     
     public bool Shading = false;
     public bool TwoStep = false;
-    public Vector4 OuterColor = new(0.9f, 0.2f, 0.2f);
-    public Vector4 InnerColor = new(0.2f, 0.2f, 0.9f);
+    public Color OuterColor = new(0.9f, 0.2f, 0.2f);
+    public Color InnerColor = new(0.2f, 0.2f, 0.9f);
 
     public Matrix4 TransformationMat = Matrix4.Identity;
 
@@ -37,6 +37,7 @@ public class Sphere
             GeneratePoints();
             GenerateTriangles();
             Transform();
+            GenerateColors();
             Update = false;
         }
 
@@ -104,8 +105,8 @@ public class Sphere
                     (i + 1, j)
                 );
                 triangles[index + 1] = new Triangle(
-                    (i + 1, j + 1),
                     (i, j + 1),
+                    (i + 1, j + 1),
                     (i + 1, j)
                 );
             }
@@ -129,6 +130,36 @@ public class Sphere
 
     private void GenerateColors()
     {
+        for (int i = 0; i < _triangles.Length; i++)
+        {
+            Vector4 n = NewellNormal([
+                            _points[_triangles[i].IdxP1.I, _triangles[i].IdxP1.J], 
+                            _points[_triangles[i].IdxP2.I, _triangles[i].IdxP2.J], 
+                            _points[_triangles[i].IdxP3.I, _triangles[i].IdxP3.J]]);
+            
+            n = Vector4.Normalize(n);
+            float cos = n.Z;
+            
+            if (cos >= 0)
+                _triangles[i].SetColor(new Color(1f, 0, 0) * cos);
+            else
+                _triangles[i].SetColor(new Color(0, 0, 0f) * MathF.Abs(cos));
+        }
+    }
+
+    private Vector4 NewellNormal(Vector4[] points)
+    {
+        var n = new Vector4(0, 0, 0);
         
+        for (int i = 0; i < points.Length; i++)
+        {
+            Vector4 p0 = points[i];
+            Vector4 p1 = points[(i + 1) % points.Length];
+            
+            n.X += (p0.Y - p1.Y) * (p0.Z + p1.Z);
+            n.Y += (p0.Z - p1.Z) * (p0.X + p1.X);
+            n.Z += (p0.X - p1.X) * (p0.Y + p1.Y);
+        }
+        return n;
     }
 }

@@ -5,10 +5,13 @@ namespace CSharpSphere;
 
 public struct Triangle((int, int) point1, (int, int) point2, (int, int) point3)
 {
-    public VertexIndex Point1 = new(point1.Item1, point1.Item2);
-    public VertexIndex Point2 = new(point2.Item1, point2.Item2);
-    public VertexIndex Point3 = new(point3.Item1, point3.Item2);
+    public VertexIndex IdxP1 = new(point1.Item1, point1.Item2);
+    public VertexIndex IdxP2 = new(point2.Item1, point2.Item2);
+    public VertexIndex IdxP3 = new(point3.Item1, point3.Item2);
+    
     public Color Color;
+    
+    public void SetColor(Color color) => Color = color;
 }
 
 
@@ -23,10 +26,17 @@ public readonly struct VertexIndex(int i, int j)
 
 public struct Vector4(float x, float y, float z, float w = 1f)
 {
-    public readonly float X = x;
-    public readonly float Y = y;
-    public readonly float Z = z;
+    public float X = x;
+    public float Y = y;
+    public float Z = z;
     public readonly float W = w;
+
+    public static Vector4 Normalize(Vector4 v)
+    {
+        float len = v.X * v.X + v.Y * v.Y + v.Z * v.Z + v.W * v.W;
+        float inv = 1.0f / MathF.Sqrt(len);
+        return new Vector4(v.X * inv, v.Y * inv, v.Z * inv, v.W * inv);
+    }
 }
 
 public struct Color(float r, float g, float b)
@@ -34,6 +44,11 @@ public struct Color(float r, float g, float b)
     public readonly float R = r;
     public readonly float G = g;
     public readonly float B = b;
+
+    public static Color operator *(Color c, float f)
+    {
+        return new Color(c.R*f, c.G*f, c.B*f);
+    }
 }
 
 public struct Matrix4

@@ -73,9 +73,9 @@ public static class Program
         
         foreach (var tri in triangles)
         {
-            var p1 = points[tri.Point1.I, tri.Point1.J];
-            var p2 = points[tri.Point2.I, tri.Point2.J];
-            var p3 = points[tri.Point3.I, tri.Point3.J];
+            var p1 = points[tri.IdxP1.I, tri.IdxP1.J];
+            var p2 = points[tri.IdxP2.I, tri.IdxP2.J];
+            var p3 = points[tri.IdxP3.I, tri.IdxP3.J];
             
             DrawLine(p1, p2);
             DrawLine(p2, p3);
@@ -91,11 +91,12 @@ public static class Program
 
         foreach (var tri in triangles)
         {
-            var p1 = points[tri.Point1.I, tri.Point1.J];
-            var p2 = points[tri.Point2.I, tri.Point2.J];
-            var p3 = points[tri.Point3.I, tri.Point3.J];
+            var p1 = points[tri.IdxP1.I, tri.IdxP1.J];
+            var p2 = points[tri.IdxP2.I, tri.IdxP2.J];
+            var p3 = points[tri.IdxP3.I, tri.IdxP3.J];
             
-            // Получить цвет и установить его
+            var color = tri.Color;
+            _gl.Color3(color.R, color.G, color.B);
             
             DrawTriangle(p1, p2, p3);
         }

@@ -15,27 +15,35 @@ public class Sphere
     public int VDiv = 21;
 
     private Vector4[,] _points = null!;
-    private Vector4[,] _transformedPoints = null!;
     private Triangle[] _triangles = null!;
     public bool Update = true;
+    
+    public bool Shading = false;
+    public bool TwoStep = false;
+    public Vector4 OuterColor = new(0.9f, 0.2f, 0.2f);
+    public Vector4 InnerColor = new(0.2f, 0.2f, 0.9f);
 
     public Matrix4 TransformationMat = Matrix4.Identity;
 
     /// <seealso href="https://registry.khronos.org/OpenGL/specs/gl/glspec30.pdf#subsection.2.6.1">
     ///     Спецификация OpenGL 3.0
     /// </seealso>
-    public void DrawWireframeSphere()
+    public void Draw()
     {
         var watch = Stopwatch.StartNew();
 
         if (Update)
         {
-            _points = GeneratePoints();
-            _triangles = GenerateTriangles(_points);
-            _transformedPoints = Transform(_points);
+            GeneratePoints();
+            GenerateTriangles();
+            Transform();
             Update = false;
         }
-        DrawLines(_triangles, _transformedPoints);
+
+        if (Shading)
+            DrawPolygons(_triangles, _points);
+        else
+            DrawLines(_triangles, _points);
         
         watch.Stop();
     }
@@ -48,9 +56,9 @@ public class Sphere
     /// <seealso href="https://ps-group.github.io/opengl/lesson_11#wow1">
     ///     UV-параметризация сферы
     /// </seealso>
-    private Vector4[,] GeneratePoints()
+    private void GeneratePoints()
     {
-        var points =  new Vector4[VDiv + 1, UDiv + 1];
+        var points = new Vector4[VDiv + 1, UDiv + 1];
 
         Parallel.For(0, VDiv + 1, row =>
         {
@@ -65,38 +73,22 @@ public class Sphere
 
                 float sinU = MathF.Sin(u);
                 float cosU = MathF.Cos(u);
-
-                float r = R;
-                float x = r * cosU * sinV;
-                float y = r * cosV;
-                float z = r * sinU * sinV;
+                
+                float x = R * cosU * sinV;
+                float y = R * cosV;
+                float z = R * sinU * sinV;
                 
                 points[row, col] = new Vector4(x, y, z);
             }
         });
         
-        return points;
-    }
-
-    private Vector4[,] Transform(Vector4[,] points)
-    {
-        var result = new Vector4[VDiv + 1, UDiv + 1];
-
-        Parallel.For(0, VDiv + 1, row =>
-        {
-            for (int col = 0; col < UDiv + 1; col++)
-            {
-                result[row, col] = points[row, col] * TransformationMat;
-            }
-        });
-        
-        return result;
+        _points = points;
     }
     
-    private static Triangle[] GenerateTriangles(Vector4[,] points)
+    private void GenerateTriangles()
     {
-        int cols = points.GetLength(1);
-        int rows = points.GetLength(0);
+        int cols = UDiv + 1;
+        int rows = VDiv + 1;
         
         var triangles = new Triangle[2 * (rows - 1) * (cols - 1)];
 
@@ -119,6 +111,24 @@ public class Sphere
             }
         });
         
-        return triangles;
+        _triangles = triangles;
+    }
+    
+    private void Transform()
+    {
+        var result = new Vector4[VDiv + 1, UDiv + 1];
+
+        Parallel.For(0, VDiv + 1, row =>
+        {
+            for (int col = 0; col < UDiv + 1; col++)
+                result[row, col] = _points[row, col] * TransformationMat;
+        });
+        
+       _points = result;
+    }
+
+    private void GenerateColors()
+    {
+        
     }
 }

@@ -27,7 +27,10 @@ public static class Program
                 ContextAPI.OpenGL,
                 ContextProfile.Compatability,
                 ContextFlags.Default,
-                new APIVersion(3, 3))
+                new APIVersion(3, 3)),
+            // Samples = 4,
+            // PreferredDepthBufferBits = 24,
+            VSync = true
         };
         _window = Window.Create(options);
         _window.Load += OnLoad;
@@ -42,7 +45,7 @@ public static class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        _ui = new Gui(_gl, _window, _input, Sphere, 18);
+        _ui = new Gui(_gl, _window, _input, Sphere, 12);
         OnResize(_window.Size);
     }
 
@@ -56,9 +59,9 @@ public static class Program
     private static void OnRender(double deltaTime)
     {
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        _gl.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         DrawAxesXy();
-        Sphere.DrawWireframeSphere();
+        Sphere.Draw();
         DrawAxesZ();
         _ui.RenderUi(deltaTime);
     }
@@ -66,8 +69,7 @@ public static class Program
     public static void DrawLines(Triangle[] triangles, Vector4[,] points)
     {
         _gl.Begin(GLEnum.Lines);
-        _gl.LineWidth(2f);
-        _gl.Color3(0.5f, 0.5f, 0.5f);
+        _gl.Color3(0.6f, 0.6f, 0.6f);
         
         foreach (var tri in triangles)
         {
@@ -81,6 +83,29 @@ public static class Program
         }
         
         _gl.End();
+    }
+
+    public static void DrawPolygons(Triangle[] triangles, Vector4[,] points)
+    {
+        _gl.Begin(GLEnum.Triangles);
+
+        foreach (var tri in triangles)
+        {
+            var p1 = points[tri.Point1.I, tri.Point1.J];
+            var p2 = points[tri.Point2.I, tri.Point2.J];
+            var p3 = points[tri.Point3.I, tri.Point3.J];
+            
+            // Получить цвет и установить его
+            
+            DrawTriangle(p1, p2, p3);
+        }
+    }
+
+    private static void DrawTriangle(Vector4 p1, Vector4 p2, Vector4 p3)
+    {
+        _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
+        _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
+        _gl.Vertex2(p3.X / _windowMinSize, p3.Y / _windowMinSize);
     }
 
     private static void DrawLine(Vector4 p1, Vector4 p2)

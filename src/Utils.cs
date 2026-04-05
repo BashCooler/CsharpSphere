@@ -8,6 +8,7 @@ public struct Triangle((int, int) point1, (int, int) point2, (int, int) point3)
     public VertexIndex Point1 = new(point1.Item1, point1.Item2);
     public VertexIndex Point2 = new(point2.Item1, point2.Item2);
     public VertexIndex Point3 = new(point3.Item1, point3.Item2);
+    public Color Color;
 }
 
 
@@ -28,6 +29,12 @@ public struct Vector4(float x, float y, float z, float w = 1f)
     public readonly float W = w;
 }
 
+public struct Color(float r, float g, float b)
+{
+    public readonly float R = r;
+    public readonly float G = g;
+    public readonly float B = b;
+}
 
 public struct Matrix4
 {

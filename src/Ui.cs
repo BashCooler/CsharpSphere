@@ -36,7 +36,7 @@ public class Gui
         
         GetIO().FontGlobalScale = fontScale;
         GetStyle().ScaleAllSizes(scale);
-        StyleColorsLight();
+        StyleColorsClassic();
         PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
         PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
         PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
@@ -46,8 +46,8 @@ public class Gui
     {
         _controller.Update((float)deltaTime);
 
-        float height = GetFontSize() * 25.5f;
-        SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
+        // float height = GetFontSize() * 25.5f;
+        // SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
         Begin("Параметры сферы");
         
         Group("1", () =>
@@ -73,6 +73,11 @@ public class Gui
             DragAngle("AngleX", ref _stateX, Matrix4.GetRotateX, ref _sphere.Update);
             DragAngle("AngleY", ref _stateY, Matrix4.GetRotateY, ref _sphere.Update);
             DragAngle("AngleZ", ref _stateZ, Matrix4.GetRotateZ, ref _sphere.Update);
+        });
+
+        Group("5", () =>
+        {
+            Checkbox("Шейдер", ref _sphere.Shading);
         });
         
         End();

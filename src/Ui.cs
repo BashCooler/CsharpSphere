@@ -77,11 +77,13 @@ public class Gui
 
         Group("5", () =>
         {
+            Label("", "Отрисовка", "");
             bool shadingChanged = Checkbox("Шейдер", ref _sphere.Shading);
-            if (shadingChanged) 
-                _sphere.Update = true;
+            if (shadingChanged) _sphere.Update = true;
 
-            Checkbox("TwoStep", ref _sphere.TwoStep);
+            if (!_sphere.Shading) BeginDisabled();
+            Checkbox("Отрисовка в 2 этапа", ref _sphere.TwoStep);
+            if (!_sphere.Shading) EndDisabled();
         });
         
         End();

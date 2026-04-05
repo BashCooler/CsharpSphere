@@ -85,17 +85,39 @@ public static class Program
         _gl.End();
     }
 
-    public static void DrawPolygons(Triangle[] triangles, Vector4[,] points)
+    public static void DrawPolygons(Triangle[] triangles, Vector4[,] points, bool TwoStep = true)
     {
         _gl.Begin(GLEnum.Triangles);
 
-        foreach (var tri in triangles)
+        foreach (Triangle tri in triangles)
         {
-            var p1 = points[tri.IdxP1.I, tri.IdxP1.J];
-            var p2 = points[tri.IdxP2.I, tri.IdxP2.J];
-            var p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            if (TwoStep && tri.Front) continue;
             
-            var color = tri.Color;
+            Vector4 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
+            Vector4 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
+            Vector4 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            
+            Color color = tri.Color;
+            _gl.Color3(color.R, color.G, color.B);
+            
+            DrawTriangle(p1, p2, p3);
+        }
+
+        if (!TwoStep)
+        {
+            _gl.End();
+            return;
+        }
+
+        foreach (Triangle tri in triangles)
+        {
+            if (!tri.Front) return;
+            
+            Vector4 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
+            Vector4 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
+            Vector4 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            
+            Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
             
             DrawTriangle(p1, p2, p3);

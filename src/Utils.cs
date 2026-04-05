@@ -3,15 +3,26 @@ using System.Diagnostics;
 namespace CSharpSphere;
 
 
-public struct Triangle((int, int) point1, (int, int) point2, (int, int) point3)
+public class Triangle((int, int) point1, (int, int) point2, (int, int) point3)
 {
     public VertexIndex IdxP1 = new(point1.Item1, point1.Item2);
     public VertexIndex IdxP2 = new(point2.Item1, point2.Item2);
     public VertexIndex IdxP3 = new(point3.Item1, point3.Item2);
     
     public Color Color;
+    public bool Front = true;
     
-    public void SetColor(Color color) => Color = color;
+    public Triangle SetColor(Color color)
+    {
+        Color = color;
+        return this;
+    }
+
+    public Triangle SetFront(bool front)
+    {
+        Front = front;
+        return this;
+    }
 }
 
 

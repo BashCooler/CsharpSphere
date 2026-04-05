@@ -19,7 +19,7 @@ public class Sphere
     public bool Update = true;
     
     public bool Shading = false;
-    public bool TwoStep = false;
+    public bool TwoStep = true;
     public Color OuterColor = new(0.9f, 0.2f, 0.2f);
     public Color InnerColor = new(0.2f, 0.2f, 0.9f);
 
@@ -37,12 +37,12 @@ public class Sphere
             GeneratePoints();
             GenerateTriangles();
             Transform();
-            GenerateColors();
+            if (Shading) GenerateColors();
             Update = false;
         }
 
         if (Shading)
-            DrawPolygons(_triangles, _points);
+            DrawPolygons(_triangles, _points, TwoStep);
         else
             DrawLines(_triangles, _points);
         
@@ -132,25 +132,25 @@ public class Sphere
     {
         var lightPos = new Vector4(0f, 0f, 1f, 0f);
 
-        for (int i = 0; i < _triangles.Length; i++)
+        foreach (Triangle tri in _triangles)
         {
             Vector4 n = NewellNormal([
-                            _points[_triangles[i].IdxP1.I, _triangles[i].IdxP1.J], 
-                            _points[_triangles[i].IdxP2.I, _triangles[i].IdxP2.J], 
-                            _points[_triangles[i].IdxP3.I, _triangles[i].IdxP3.J]]);
+                _points[tri.IdxP1.I, tri.IdxP1.J], 
+                _points[tri.IdxP2.I, tri.IdxP2.J], 
+                _points[tri.IdxP3.I, tri.IdxP3.J]]);
             
             n = Vector4.Normalize(n);
             float cos = n.X * lightPos.X + n.Y * lightPos.Y + n.Z * lightPos.Z;
             cos = Math.Clamp(cos, -1f, 1f);
             
-            if (cos >= 0)
-                _triangles[i].SetColor(OuterColor * cos);
+            if (cos >= 0) 
+                tri.SetColor(OuterColor * cos).SetFront(true);
             else
-                _triangles[i].SetColor(InnerColor * MathF.Abs(cos));
+                tri.SetColor(InnerColor * MathF.Abs(cos)).SetFront(false);
         }
     }
 
-    private Vector4 NewellNormal(Vector4[] points)
+    private static Vector4 NewellNormal(Vector4[] points)
     {
         var n = new Vector4(0, 0, 0, 0);
         

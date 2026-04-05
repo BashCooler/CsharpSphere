@@ -35,21 +35,20 @@ public readonly struct VertexIndex(int i, int j)
 }
 
 
-public struct Vector4(float x, float y, float z, float w = 1f)
+public struct Vector3(float x, float y, float z)
 {
     public float X = x;
     public float Y = y;
     public float Z = z;
-    public readonly float W = w;
 
-    public static Vector4 Normalize(Vector4 v)
+    public static Vector3 Normalize(Vector3 v)
     {
         float len = v.X * v.X + v.Y * v.Y + v.Z * v.Z;
         if (len == 0f)
-            return new Vector4(0f, 0f, 0f, v.W);
+            return new Vector3(0f, 0f, 0f);
 
         float inv = 1.0f / MathF.Sqrt(len);
-        return new Vector4(v.X * inv, v.Y * inv, v.Z * inv, v.W);
+        return new Vector3(v.X * inv, v.Y * inv, v.Z * inv);
     }
 }
 
@@ -87,17 +86,16 @@ public struct Matrix4
         {0f, 0f, 0f, 1f}
     });
 
-    public static Vector4 operator * (Vector4 v, Matrix4 m)
+    public static Vector3 operator * (Vector3 v, Matrix4 m)
     {
-        return Multiply(v, m);
+        const float w = 1.0f;
+        return new Vector3(
+            v.X * m.Mat[0, 0] + v.Y * m.Mat[1, 0] + v.Z * m.Mat[2, 0] + w * m.Mat[3, 0],
+            v.X * m.Mat[0, 1] + v.Y * m.Mat[1, 1] + v.Z * m.Mat[2, 1] + w * m.Mat[3, 1],
+            v.X * m.Mat[0, 2] + v.Y * m.Mat[1, 2] + v.Z * m.Mat[2, 2] + w * m.Mat[3, 2]);
     }
     
     public static Matrix4 operator * (Matrix4 a, Matrix4 b)
-    {
-        return Multiply(a, b);
-    }
-
-    private static Matrix4 Multiply(Matrix4 a, Matrix4 b)
     {
         var c = new float[4, 4];
         for (int i = 0; i < 4; i++)
@@ -112,15 +110,6 @@ public struct Matrix4
             }
         }
         return new Matrix4(c);
-    }
-
-    private static Vector4 Multiply(Vector4 v, Matrix4 m)
-    {
-        return new Vector4(
-            v.X * m.Mat[0, 0] + v.Y * m.Mat[1, 0] + v.Z * m.Mat[2, 0] + v.W * m.Mat[3, 0],
-            v.X * m.Mat[0, 1] + v.Y * m.Mat[1, 1] + v.Z * m.Mat[2, 1] + v.W * m.Mat[3, 1],
-            v.X * m.Mat[0, 2] + v.Y * m.Mat[1, 2] + v.Z * m.Mat[2, 2] + v.W * m.Mat[3, 2],
-            v.X * m.Mat[0, 3] + v.Y * m.Mat[1, 3] + v.Z * m.Mat[2, 3] + v.W * m.Mat[3, 3]);
     }
 
     public static Matrix4 GetRotateX(int angle)

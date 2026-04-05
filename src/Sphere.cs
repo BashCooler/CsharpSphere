@@ -14,7 +14,7 @@ public class Sphere
     public int UDiv = 20;
     public int VDiv = 21;
 
-    private Vector4[,] _points = null!;
+    private Vector3[,] _points = null!;
     private Triangle[] _triangles = null!;
     public bool Update = true;
     
@@ -53,13 +53,13 @@ public class Sphere
     /// <summary>
     ///     Составляет массив точек сферы
     /// </summary>
-    /// <returns>2D массив точек <see cref="Vector4" /></returns>
+    /// <returns>2D массив точек <see cref="Vector3" /></returns>
     /// <seealso href="https://ps-group.github.io/opengl/lesson_11#wow1">
     ///     UV-параметризация сферы
     /// </seealso>
     private void GeneratePoints()
     {
-        var points = new Vector4[VDiv + 1, UDiv + 1];
+        var points = new Vector3[VDiv + 1, UDiv + 1];
 
         Parallel.For(0, VDiv + 1, row =>
         {
@@ -79,7 +79,7 @@ public class Sphere
                 float y = R * cosV;
                 float z = R * sinU * sinV;
                 
-                points[row, col] = new Vector4(x, y, z);
+                points[row, col] = new Vector3(x, y, z);
             }
         });
         
@@ -117,7 +117,7 @@ public class Sphere
     
     private void Transform()
     {
-        var result = new Vector4[VDiv + 1, UDiv + 1];
+        var result = new Vector3[VDiv + 1, UDiv + 1];
 
         Parallel.For(0, VDiv + 1, row =>
         {
@@ -130,16 +130,16 @@ public class Sphere
 
     private void GenerateColors()
     {
-        var lightPos = new Vector4(0f, 0f, 1f, 0f);
+        var lightPos = new Vector3(0f, 0f, 1f);
 
         foreach (Triangle tri in _triangles)
         {
-            Vector4 n = NewellNormal([
+            Vector3 n = NewellNormal([
                 _points[tri.IdxP1.I, tri.IdxP1.J], 
                 _points[tri.IdxP2.I, tri.IdxP2.J], 
                 _points[tri.IdxP3.I, tri.IdxP3.J]]);
             
-            n = Vector4.Normalize(n);
+            n = Vector3.Normalize(n);
             float cos = n.X * lightPos.X + n.Y * lightPos.Y + n.Z * lightPos.Z;
             cos = Math.Clamp(cos, -1f, 1f);
             
@@ -150,14 +150,14 @@ public class Sphere
         }
     }
 
-    private static Vector4 NewellNormal(Vector4[] points)
+    private static Vector3 NewellNormal(Vector3[] points)
     {
-        var n = new Vector4(0, 0, 0, 0);
+        var n = new Vector3(0, 0, 0);
         
         for (int i = 0; i < points.Length; i++)
         {
-            Vector4 p0 = points[i];
-            Vector4 p1 = points[(i + 1) % points.Length];
+            Vector3 p0 = points[i];
+            Vector3 p1 = points[(i + 1) % points.Length];
             
             n.X += (p0.Y - p1.Y) * (p0.Z + p1.Z);
             n.Y += (p0.Z - p1.Z) * (p0.X + p1.X);

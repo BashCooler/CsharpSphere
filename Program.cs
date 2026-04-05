@@ -64,7 +64,7 @@ public static class Program
         _ui.RenderUi(deltaTime);
     }
 
-    public static void DrawLines(Triangle[] triangles, Vector4[,] points)
+    public static void DrawLines(Triangle[] triangles, Vector3[,] points)
     {
         DrawAxes(Axes.X | Axes.Y);
         
@@ -73,9 +73,9 @@ public static class Program
         
         foreach (Triangle tri in triangles)
         {
-            Vector4 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
-            Vector4 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
-            Vector4 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            Vector3 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
+            Vector3 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
+            Vector3 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
             
             DrawLine(p1, p2);
             DrawLine(p2, p3);
@@ -87,7 +87,7 @@ public static class Program
         DrawAxes(Axes.Z);
     }
 
-    public static void DrawPolygons(Triangle[] triangles, Vector4[,] points, bool TwoStep = true)
+    public static void DrawPolygons(Triangle[] triangles, Vector3[,] points, bool TwoStep = true)
     {
         _gl.Begin(GLEnum.Triangles);
 
@@ -95,9 +95,9 @@ public static class Program
         {
             if (TwoStep && tri.Front) continue;
             
-            Vector4 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
-            Vector4 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
-            Vector4 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            Vector3 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
+            Vector3 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
+            Vector3 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
             
             Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
@@ -120,9 +120,9 @@ public static class Program
         {
             if (!tri.Front) continue;
             
-            Vector4 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
-            Vector4 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
-            Vector4 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
+            Vector3 p1 = points[tri.IdxP1.I, tri.IdxP1.J];
+            Vector3 p2 = points[tri.IdxP2.I, tri.IdxP2.J];
+            Vector3 p3 = points[tri.IdxP3.I, tri.IdxP3.J];
             
             Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
@@ -133,14 +133,14 @@ public static class Program
         _gl.End();
     }
 
-    private static void DrawTriangle(Vector4 p1, Vector4 p2, Vector4 p3)
+    private static void DrawTriangle(Vector3 p1, Vector3 p2, Vector3 p3)
     {
         _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
         _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
         _gl.Vertex2(p3.X / _windowMinSize, p3.Y / _windowMinSize);
     }
 
-    private static void DrawLine(Vector4 p1, Vector4 p2)
+    private static void DrawLine(Vector3 p1, Vector3 p2)
     {
         _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
         _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);

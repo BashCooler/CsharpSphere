@@ -37,6 +37,7 @@ public class Gui
         _controller = new ImGuiController(gl, window, input, fontConfig);
         
         GetIO().FontGlobalScale = fontScale;
+        GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
         GetStyle().ScaleAllSizes(scale);
         StyleColorsClassic();
         PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
@@ -48,8 +49,11 @@ public class Gui
     {
         _controller.Update((float)deltaTime);
 
-        // float height = GetFontSize() * 25.5f;
-        // SetNextWindowSizeConstraints(new Vector2(200, height), new Vector2(1000, height));
+        DockSpaceOverViewport(
+            0,
+            GetMainViewport(),
+            ImGuiDockNodeFlags.PassthruCentralNode);
+        
         Begin("Параметры сферы");
 
         Group("1", () =>

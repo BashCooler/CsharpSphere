@@ -151,9 +151,9 @@ public struct Matrix4
         return new Matrix4(new[,]
         {
             {cos , sin, 0f, 0f},
-            {-sin, cos, 0f  , 0f},
-            {0f  , 0f , 1f , 0f},
-            {0f  , 0f , 0f  , 1f}
+            {-sin, cos, 0f, 0f},
+            {0f  , 0f , 1f, 0f},
+            {0f  , 0f , 0f, 1f}
         });
     }
 }

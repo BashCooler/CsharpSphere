@@ -33,9 +33,12 @@ public struct Vector4(float x, float y, float z, float w = 1f)
 
     public static Vector4 Normalize(Vector4 v)
     {
-        float len = v.X * v.X + v.Y * v.Y + v.Z * v.Z + v.W * v.W;
+        float len = v.X * v.X + v.Y * v.Y + v.Z * v.Z;
+        if (len == 0f)
+            return new Vector4(0f, 0f, 0f, v.W);
+
         float inv = 1.0f / MathF.Sqrt(len);
-        return new Vector4(v.X * inv, v.Y * inv, v.Z * inv, v.W * inv);
+        return new Vector4(v.X * inv, v.Y * inv, v.Z * inv, v.W);
     }
 }
 

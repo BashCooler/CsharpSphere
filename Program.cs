@@ -44,6 +44,7 @@ public static class Program
     private static void OnLoad()
     {
         _gl = GL.GetApi(_window);
+        _gl.Enable(EnableCap.DepthTest);
         _input = _window.CreateInput();
         _ui = new Gui(_gl, _window, _input, Sphere, 12);
         OnResize(_window.Size);
@@ -100,19 +101,21 @@ public static class Program
             
             DrawTriangle(p1, p2, p3);
         }
+        
+        _gl.End();
     }
 
     private static void DrawTriangle(Vector4 p1, Vector4 p2, Vector4 p3)
     {
-        _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
-        _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
-        _gl.Vertex2(p3.X / _windowMinSize, p3.Y / _windowMinSize);
+        _gl.Vertex3(p1.X / _windowMinSize, p1.Y / _windowMinSize, p1.Z / _windowMinSize);
+        _gl.Vertex3(p2.X / _windowMinSize, p2.Y / _windowMinSize, p2.Z / _windowMinSize);
+        _gl.Vertex3(p3.X / _windowMinSize, p3.Y / _windowMinSize, p3.Z / _windowMinSize);
     }
 
     private static void DrawLine(Vector4 p1, Vector4 p2)
     {
-        _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
-        _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
+        _gl.Vertex3(p1.X / _windowMinSize, p1.Y / _windowMinSize, p1.Z / _windowMinSize);
+        _gl.Vertex3(p2.X / _windowMinSize, p2.Y / _windowMinSize, p2.Z / _windowMinSize);
     }
 
     private static void DrawAxesXy()

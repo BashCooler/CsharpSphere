@@ -84,7 +84,7 @@ public class Gui
         Group("5", () =>
         {
             Label("", "Отрисовка", "");
-            bool shadingChanged = Checkbox("Шейдер", ref _sphere.Shading);
+            bool shadingChanged = Checkbox("Flat закраска", ref _sphere.Shading);
             if (shadingChanged) _sphere.Update = true;
 
             if (!_sphere.Shading) BeginDisabled();

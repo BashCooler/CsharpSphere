@@ -109,10 +109,8 @@ public struct Matrix4
             for (int j = 0; j < 4; j++)
             {
                 c[i, j] = 0;
-                for (int k = 0; k < 4; k++)
-                {
+                for (int k = 0; k < 4; k++) 
                     c[i, j] += a.Mat[i, k] * b.Mat[k, j];
-                }
             }
         }
         return new Matrix4(c);

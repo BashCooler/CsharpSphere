@@ -28,8 +28,7 @@ public static class Program
                 ContextProfile.Compatability,
                 ContextFlags.Default,
                 new APIVersion(3, 3)),
-            // Samples = 4,
-            // PreferredDepthBufferBits = 24,
+            Samples = 8,
             VSync = true
         };
         _window = Window.Create(options);
@@ -49,13 +48,6 @@ public static class Program
         OnResize(_window.Size);
     }
 
-    /// <summary>
-    ///     Очищает область отрисовки, заливая её сплошным цветом. 
-    ///     Очищает буфер цвета. Отрисовывает сферу и интерфейс пользователя.
-    /// </summary>
-    /// <seealso href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/glClear.xhtml">
-    ///     glClear и ClearBufferMask
-    /// </seealso>
     private static void OnRender(double deltaTime)
     {
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -108,11 +100,7 @@ public static class Program
         
         DrawAxes(Axes.All);
 
-        if (!TwoStep)
-        {
-            // _gl.End();
-            return;
-        }
+        if (!TwoStep) return;
         
         _gl.Begin(GLEnum.Triangles);
 
@@ -135,25 +123,26 @@ public static class Program
 
     private static void DrawTriangle(Vector3 p1, Vector3 p2, Vector3 p3)
     {
-        _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
-        _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
-        _gl.Vertex2(p3.X / _windowMinSize, p3.Y / _windowMinSize);
+        var s = _windowMinSize;
+        _gl.Vertex2(p1.X / s, p1.Y / s);
+        _gl.Vertex2(p2.X / s, p2.Y / s);
+        _gl.Vertex2(p3.X / s, p3.Y / s);
     }
 
     private static void DrawLine(Vector3 p1, Vector3 p2)
     {
-        _gl.Vertex2(p1.X / _windowMinSize, p1.Y / _windowMinSize);
-        _gl.Vertex2(p2.X / _windowMinSize, p2.Y / _windowMinSize);
+        var s = _windowMinSize;
+        _gl.Vertex2(p1.X / s, p1.Y / s);
+        _gl.Vertex2(p2.X / s, p2.Y / s);
     }
 
     [Flags]
     private enum Axes
     {
-        None = 0,
-        X = 1 << 0,     // 1
-        Y = 1 << 1,     // 2
-        Z = 1 << 2,     // 4
-        All = X | Y | Z // 7
+        X = 1 << 0,
+        Y = 1 << 1,
+        Z = 1 << 2,
+        All = X | Y | Z
     }
 
     private static void DrawAxes(Axes axes)
@@ -190,16 +179,6 @@ public static class Program
         _gl.PointSize(1f);
     }
 
-    /// <summary>
-    ///     Задает размер Viewport равный новому размеру окна. <br />
-    ///     Переходит в режим изменения стека матриц проекций <see cref="GLEnum.Projection" />.
-    ///     Загружает единичную матрицу, к которой будут применены изменения.
-    ///     Задает новое соотношение сторон методом <see cref="SetAspectRatio" />.
-    ///     Возвращается в основной режим <see cref="GLEnum.Modelview" />.
-    /// </summary>
-    /// <seealso href="https://learn.microsoft.com/ru-ru/windows/win32/opengl/glmatrixmode">
-    ///     Функция glMatrixMode
-    /// </seealso>
     private static void OnResize(Vector2D<int> size)
     {
         _gl.Viewport(size);
@@ -209,16 +188,6 @@ public static class Program
         _gl.MatrixMode(GLEnum.Modelview);
     }
 
-    /// <summary>
-    ///     Задает видимую область так, чтобы сфера всегда была круглой. Если ширина окна 
-    ///     больше высоты, увеличивает отступы по бокам. В ином случае увеличивает отступы 
-    ///     сверху и снизу. Область отступов отсекается во время рендера.
-    /// </summary>
-    /// <param name="w">ширина</param>
-    /// <param name="h">высота</param>
-    /// <seealso href="https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/glOrtho.xml">
-    ///     Метод glOrtho
-    /// </seealso>
     private static void SetAspectRatio(int w, int h)
     {
         float a = (float)w / h;

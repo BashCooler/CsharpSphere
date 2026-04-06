@@ -20,14 +20,11 @@ public class Sphere
     
     public bool Shading = false;
     public bool TwoStep = true;
-    public Color OuterColor = new(0.9f, 0.2f, 0.2f);
-    public Color InnerColor = new(0.2f, 0.2f, 0.9f);
+    public Color OuterColor = new(0.8f, 0.2f, 0.2f);
+    public Color InnerColor = new(0.2f, 0.2f, 0.65f);
 
     public Matrix4 TransformationMat = Matrix4.Identity;
 
-    /// <seealso href="https://registry.khronos.org/OpenGL/specs/gl/glspec30.pdf#subsection.2.6.1">
-    ///     Спецификация OpenGL 3.0
-    /// </seealso>
     public void Draw()
     {
         var watch = Stopwatch.StartNew();
@@ -50,13 +47,6 @@ public class Sphere
     }
     
     
-    /// <summary>
-    ///     Составляет массив точек сферы
-    /// </summary>
-    /// <returns>2D массив точек <see cref="Vector3" /></returns>
-    /// <seealso href="https://ps-group.github.io/opengl/lesson_11#wow1">
-    ///     UV-параметризация сферы
-    /// </seealso>
     private void GeneratePoints()
     {
         var points = new Vector3[VDiv + 1, UDiv + 1];
@@ -102,13 +92,11 @@ public class Sphere
                 triangles[index] = new Triangle(
                     (i, j),
                     (i, j + 1),
-                    (i + 1, j)
-                );
+                    (i + 1, j));
                 triangles[index + 1] = new Triangle(
                     (i, j + 1),
                     (i + 1, j + 1),
-                    (i + 1, j)
-                );
+                    (i + 1, j));
             }
         });
         
@@ -140,10 +128,9 @@ public class Sphere
                 tri.GetP3(_points)];
             
             Vector3 n = NewellNormal(points);
-            
             n = Vector3.Normalize(n);
+            
             float cos = n.X * lightPos.X + n.Y * lightPos.Y + n.Z * lightPos.Z;
-            cos = Math.Clamp(cos, -1f, 1f);
             
             if (cos >= 0) 
                 tri.SetColor(OuterColor * cos).SetFront(true);

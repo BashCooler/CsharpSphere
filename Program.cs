@@ -15,6 +15,7 @@ public static class Program
     private static Gui _ui = null!;
     private static readonly Sphere Sphere = new();
 
+    private const int Font = 12;
     private static int _windowMinSize;
     
     public static void Main()
@@ -44,7 +45,7 @@ public static class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        _ui = new Gui(_gl, _window, _input, Sphere, 12);
+        _ui = new Gui(_gl, _window, _input, Sphere, Font);
         OnResize(_window.Size);
     }
 
@@ -155,6 +156,13 @@ public static class Program
             _gl.Color3(0.8f, 0f, 0f);
             _gl.Vertex2(0, 0);
             _gl.Vertex2(0.75f, 0);
+            
+            float c = 0.75f * _windowMinSize + Font;
+            float s = _windowMinSize;
+            _gl.Vertex2((c - Font * 0.5f) / s, -Font * 1.5f * 0.5f / s);
+            _gl.Vertex2((c + Font * 0.5f) / s,  Font * 1.5f * 0.5f / s);
+            _gl.Vertex2((c - Font * 0.5f) / s,  Font * 1.5f * 0.5f / s);
+            _gl.Vertex2((c + Font * 0.5f) / s, -Font * 1.5f * 0.5f / s);
         }
 
         if (axes.HasFlag(Axes.Y))
@@ -162,21 +170,43 @@ public static class Program
             _gl.Color3(0f, 0.8f, 0f);
             _gl.Vertex2(0, 0);
             _gl.Vertex2(0, 0.75f);
+            
+            float c = 0.75f * _windowMinSize + Font * 1.5f;
+            float s = _windowMinSize;
+            _gl.Vertex2((0 - Font * 0.5f) / s, (c + Font * 1.5f * 0.5f) / s);
+            _gl.Vertex2(0, c / _windowMinSize);
+            _gl.Vertex2((0 + Font * 0.5f) / s, (c + Font * 1.5f * 0.5f) / s);
+            _gl.Vertex2(0, c / s);
+            _gl.Vertex2(0, c / s);
+            _gl.Vertex2(0, (c - Font * 1.5f * 0.5f) / s);
         }
         
         _gl.End();
-        _gl.LineWidth(1.0f);
 
-        if (!axes.HasFlag(Axes.Z)) return;
-        
-        _gl.PointSize(5f);
-        _gl.Begin(GLEnum.Points);
+        if (axes.HasFlag(Axes.Z))
+        {
+            _gl.PointSize(5f);
+            _gl.Begin(GLEnum.Points);
+
+            _gl.Color3(0f, 0.2f, 0.8f);
+            _gl.Vertex3(0, 0, 0);
+
+            _gl.End();
+            _gl.PointSize(1f);
             
-        _gl.Color3(0f, 0.2f, 0.8f);
-        _gl.Vertex3(0, 0, 0);
+            _gl.Begin(GLEnum.Lines);
+            const float c = -Font * 1.5f;
+            float s = _windowMinSize;
+            _gl.Vertex2((c - Font * 0.5f) / s,  Font * 1.5d * 0.5f / s);
+            _gl.Vertex2((c + Font * 0.5f) / s,  Font * 1.5d * 0.5f / s);
+            _gl.Vertex2((c + Font * 0.5f) / s,  Font * 1.5d * 0.5f / s);
+            _gl.Vertex2((c - Font * 0.5f) / s, -Font * 1.5d * 0.5f / s);
+            _gl.Vertex2((c - Font * 0.5f) / s, -Font * 1.5d * 0.5f / s);
+            _gl.Vertex2((c + Font * 0.5f) / s, -Font * 1.5d * 0.5f / s);
+            _gl.End();
+        }
         
-        _gl.End();
-        _gl.PointSize(1f);
+        _gl.LineWidth(1.0f);
     }
 
     private static void OnResize(Vector2D<int> size)

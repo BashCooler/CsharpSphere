@@ -12,7 +12,7 @@ public class Sphere
     public int UMax = 360;
     public int VMax = 180;
     public int UDiv = 20;
-    public int VDiv = 21;
+    public int VDiv = 20;
 
     private Vector3[,] _points = null!;
     private Triangle[] _triangles = null!;

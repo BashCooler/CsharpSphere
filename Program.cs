@@ -15,7 +15,7 @@ public static partial class Program
     private static Gui _ui = null!;
     private static readonly Sphere Sphere = new();
 
-    private const int Font = 12;
+    private const int Font = 18;
     private static int _windowMinSize;
     
     public static void Main()
@@ -51,8 +51,8 @@ public static partial class Program
 
     private static void OnRender(double deltaTime)
     {
-        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         Sphere.Draw();
         _ui.RenderUi(deltaTime);
     }

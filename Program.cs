@@ -64,6 +64,8 @@ public static partial class Program
         _gl.LoadIdentity();
         SetAspectRatio(size.X, size.Y);
         _gl.MatrixMode(GLEnum.Modelview);
+        _gl.LoadIdentity();
+        _gl.Translate(0.3f, 0.0f, 0.0f);
     }
 
     private static void SetAspectRatio(int w, int h)

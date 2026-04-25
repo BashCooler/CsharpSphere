@@ -59,12 +59,13 @@ public class Gui
         Group("1", () =>
         {
             SliderI("R, пиксель", ref _sphere.R, 0, 3000, ref _sphere.Update);
+            
         });
 
         Group("2", () =>
         {
             SliderI("Max U", ref _sphere.UMax, 0, 360, ref _sphere.Update);
-            SliderI("Мax V", ref _sphere.VMax, 0, 180, ref _sphere.Update);
+            SliderI("Мax V", ref _sphere.VMax, 0, 360, ref _sphere.Update);
         });
 
         Group("3", () =>

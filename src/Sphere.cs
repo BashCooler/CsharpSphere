@@ -1,34 +1,30 @@
 #pragma warning disable CS0618 // Type or member is obsolete
 
-using System.Diagnostics;
-
 using static CSharpSphere.Program;
 
 namespace CSharpSphere;
 
-public class Sphere
+public abstract class Surface
 {
-    public int R = 700;
+    private Vector3[,] _points = null!;
+    private Triangle[] _triangles = null!;
+    
     public int UMax = 360;
     public int VMax = 180;
     public int UDiv = 20;
     public int VDiv = 20;
 
-    private Vector3[,] _points = null!;
-    private Triangle[] _triangles = null!;
     public bool Update = true;
-    
     public bool Shading = false;
     public bool TwoStep = true;
+    
+    public Matrix4 TransformationMat = Matrix4.Identity;
+    
     public Color OuterColor = new(0.8f, 0.2f, 0.2f);
     public Color InnerColor = new(0.2f, 0.2f, 0.65f);
 
-    public Matrix4 TransformationMat = Matrix4.Identity;
-
     public void Draw()
     {
-        var watch = Stopwatch.StartNew();
-
         if (Update)
         {
             GeneratePoints();
@@ -42,11 +38,8 @@ public class Sphere
             DrawPolygons(_triangles, _points, TwoStep);
         else
             DrawLines(_triangles, _points);
-        
-        watch.Stop();
     }
-    
-    
+
     private void GeneratePoints()
     {
         var points = new Vector3[VDiv + 1, UDiv + 1];
@@ -64,18 +57,16 @@ public class Sphere
 
                 float sinU = MathF.Sin(u);
                 float cosU = MathF.Cos(u);
-                
-                float x = R * cosU * sinV;
-                float y = R * cosV;
-                float z = R * sinU * sinV;
-                
-                points[row, col] = new Vector3(x, y, z);
+
+                points[row, col] = GeneratePoint(cosU, sinV, cosV, sinU);
             }
         });
         
         _points = points;
     }
-    
+
+    protected abstract Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU);
+
     private void GenerateTriangles()
     {
         int cols = UDiv + 1;
@@ -113,9 +104,9 @@ public class Sphere
                 result[row, col] = _points[row, col] * TransformationMat;
         });
         
-       _points = result;
+        _points = result;
     }
-
+    
     private void GenerateColors()
     {
         var lightPos = new Vector3(0f, 0f, 1f);
@@ -153,5 +144,19 @@ public class Sphere
             n.Z += (p0.X - p1.X) * (p0.Y + p1.Y);
         }
         return n;
+    }
+}
+
+public class Sphere : Surface
+{
+    public int R = 700;
+
+    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
+    {
+        float x = R * cosU * sinV;
+        float y = R * cosV;
+        float z = R * sinU * sinV;
+        
+        return new Vector3(x, y, z);
     }
 }

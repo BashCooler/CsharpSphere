@@ -16,7 +16,7 @@ public class Sphere() : Surface(vMax: 180)
     }
 }
 
-public class Torus : Surface
+public class Torus() : Surface(mode: Render.DepthTest)
 {
     public int R = 450;
     public int r = 250;
@@ -32,7 +32,15 @@ public class Torus : Surface
 }
 
 
-public abstract class Surface(int vMax = 360)
+public enum Render
+{
+    Single,
+    Double,
+    DepthTest
+}
+
+
+public abstract class Surface(int vMax = 360, Render mode = Render.Double)
 {
     private Vector3[,] _points = null!;
     private Triangle[] _triangles = null!;
@@ -44,7 +52,7 @@ public abstract class Surface(int vMax = 360)
 
     public bool Update = true;
     public bool Shading = false;
-    public bool TwoStep = true;
+    public Render RenderMode = mode;
     
     public Matrix4 TransformationMat = Matrix4.Identity;
     
@@ -63,7 +71,7 @@ public abstract class Surface(int vMax = 360)
         }
 
         if (Shading)
-            Program.DrawFlat(_triangles, _points, TwoStep);
+            Program.DrawFlat(_triangles, _points, RenderMode);
         else
             Program.DrawWireframe(_triangles, _points);
     }

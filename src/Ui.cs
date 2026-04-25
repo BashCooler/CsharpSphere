@@ -114,11 +114,33 @@ public partial class Gui
         Group("5", () =>
         {
             Label("", "Отрисовка", "");
-            bool shadingChanged = Checkbox("Flat закраска", ref surface.Shading);
-            if (shadingChanged) surface.Update = true;
+            Group("Surface", () =>
+            {
+                if (RadioButton("Wireframe", !surface.Shading))
+                {
+                    surface.Shading = false;
+                    surface.Update = true;
+                }
+
+                if (RadioButton("Flat закраска", surface.Shading))
+                {
+                    surface.Shading = true;
+                    surface.Update = true;
+                }
+            });
 
             if (!surface.Shading) BeginDisabled();
-            Checkbox("Отрисовка в 2 этапа", ref surface.TwoStep);
+            Group("Render mode", () =>
+            {
+                Label("", "Алгоритм", "");
+                if (RadioButton("1 цикл", surface.RenderMode == Render.Single)) 
+                    surface.RenderMode = Render.Single;
+                if (RadioButton("2 цикла", surface.RenderMode == Render.Double)) 
+                    surface.RenderMode = Render.Double;
+                if (RadioButton("Z-буфер (OpenGL)", surface.RenderMode == Render.DepthTest)) 
+                    surface.RenderMode = Render.DepthTest;
+            });
+            
             
             Group("6", () =>
             {

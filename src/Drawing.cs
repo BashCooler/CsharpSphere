@@ -29,18 +29,25 @@ public static partial class Program
         DrawAxes(Axes.Z);
     }
 
-    public static void DrawFlat(Triangle[] triangles, Vector3[,] points, bool twoStep = true, bool depthTest = false)
+    public static void DrawFlat(Triangle[] triangles, Vector3[,] points, Render mode)
     {
-        if (!twoStep)
+        switch (mode)
         {
-            DrawTriangles(triangles, points, Sides.All);
-            DrawAxes(Axes.All);
-            return;
+            case Render.Single:
+                DrawTriangles(triangles, points, Sides.All);
+                DrawAxes(Axes.All);
+                break;
+            default:
+            case Render.Double:
+                DrawTriangles(triangles, points, Sides.Back);
+                DrawAxes(Axes.All);
+                DrawTriangles(triangles, points, Sides.Front);
+                break;
+            case Render.DepthTest:
+                DrawTriangles(triangles, points, Sides.All, true);
+                DrawAxes(Axes.All, true);
+                break;
         }
-        
-        DrawTriangles(triangles, points, Sides.Back);
-        DrawAxes(Axes.All);
-        DrawTriangles(triangles, points, Sides.Front);
     }
     
     [Flags]
@@ -51,8 +58,9 @@ public static partial class Program
         All = Front | Back
     }
 
-    private static void DrawTriangles(Triangle[] triangles, Vector3[,] points, Sides sides)
+    private static void DrawTriangles(Triangle[] triangles, Vector3[,] points, Sides sides, bool depthTest = false)
     {
+        if (depthTest) _gl.Enable(EnableCap.DepthTest);
         _gl.Begin(GLEnum.Triangles);
 
         foreach (Triangle tri in triangles)
@@ -72,11 +80,20 @@ public static partial class Program
             
             Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
-            
-            DrawTriangle(p1, p2, p3);
+
+            switch (depthTest)
+            {
+                case true: 
+                    DrawTriangle3D(p1, p2, p3);
+                    break;
+                case false:
+                    DrawTriangle(p1, p2, p3);
+                    break;
+            }
         }
         
         _gl.End();
+        if (depthTest) _gl.Disable(EnableCap.DepthTest);
     }
 
     private static void DrawTriangle(Vector3 p1, Vector3 p2, Vector3 p3)
@@ -85,6 +102,14 @@ public static partial class Program
         _gl.Vertex2(p1.X / s, p1.Y / s);
         _gl.Vertex2(p2.X / s, p2.Y / s);
         _gl.Vertex2(p3.X / s, p3.Y / s);
+    }
+
+    private static void DrawTriangle3D(Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        var s = _windowMinSize;
+        _gl.Vertex3(p1.X / s, p1.Y / s, p1.Z / s);
+        _gl.Vertex3(p2.X / s, p2.Y / s, p2.Z / s);
+        _gl.Vertex3(p3.X / s, p3.Y / s, p3.Z / s);
     }
 
     private static void DrawLine(Vector3 p1, Vector3 p2)
@@ -103,8 +128,9 @@ public static partial class Program
         All = X | Y | Z
     }
 
-    private static void DrawAxes(Axes axes)
+    private static void DrawAxes(Axes axes, bool depthTest = false)
     {
+        if (depthTest) _gl.Enable(EnableCap.DepthTest);
         _gl.LineWidth(3f);
         
         if (axes.HasFlag(Axes.X))
@@ -138,7 +164,7 @@ public static partial class Program
             _gl.Begin(GLEnum.Points);
 
             _gl.Color3(0f, 0.2f, 0.8f);
-            _gl.Vertex3(0, 0, 0);
+            _gl.Vertex3(0, 0, 0.75f);
 
             _gl.End();
             _gl.PointSize(1f);
@@ -147,6 +173,7 @@ public static partial class Program
         }
         
         _gl.LineWidth(1.0f);
+        if (depthTest) _gl.Disable(EnableCap.DepthTest);
     }
 
     private static void DrawLabelX()
@@ -183,12 +210,12 @@ public static partial class Program
         float s = _windowMinSize;
         
         _gl.Begin(GLEnum.Lines);
-        _gl.Vertex2((c - Font * 0.5f) / s,  Font * 1.5d * 0.5f / s);
-        _gl.Vertex2((c + Font * 0.5f) / s,  Font * 1.5d * 0.5f / s);
-        _gl.Vertex2((c + Font * 0.5f) / s,  Font * 1.5d * 0.5f / s);
-        _gl.Vertex2((c - Font * 0.5f) / s, -Font * 1.5d * 0.5f / s);
-        _gl.Vertex2((c - Font * 0.5f) / s, -Font * 1.5d * 0.5f / s);
-        _gl.Vertex2((c + Font * 0.5f) / s, -Font * 1.5d * 0.5f / s);
+        _gl.Vertex3((c - Font * 0.5f) / s,  Font * 1.5d * 0.5f / s, 0.75f);
+        _gl.Vertex3((c + Font * 0.5f) / s,  Font * 1.5d * 0.5f / s, 0.75f);
+        _gl.Vertex3((c + Font * 0.5f) / s,  Font * 1.5d * 0.5f / s, 0.75f);
+        _gl.Vertex3((c - Font * 0.5f) / s, -Font * 1.5d * 0.5f / s, 0.75f);
+        _gl.Vertex3((c - Font * 0.5f) / s, -Font * 1.5d * 0.5f / s, 0.75f);
+        _gl.Vertex3((c + Font * 0.5f) / s, -Font * 1.5d * 0.5f / s, 0.75f);
         _gl.End();
     }
 }

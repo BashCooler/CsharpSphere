@@ -3,7 +3,7 @@ using Silk.NET.Input;
 using Silk.NET.Windowing;
 using Silk.NET.OpenGL.Legacy;
 using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
-
+using static CSharpSphere.Program;
 using static ImGuiNET.ImGui;
 
 namespace CSharpSphere;
@@ -46,7 +46,7 @@ public partial class Gui
         PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 
-    public void RenderUi(double deltaTime, ref Program.Surface selectedSurface)
+    public void RenderUi(double deltaTime, ref SurfaceType selectedSurfaceType)
     {
         _controller.Update((float)deltaTime);
 
@@ -57,22 +57,22 @@ public partial class Gui
         
         Begin("Параметры сферы");
 
-        Program.Surface surf = selectedSurface;
+        SurfaceType surf = selectedSurfaceType;
         
         Group("0", () =>
         {
             Label("", "Поверхность", "");
-            if (RadioButton("Сфера", surf == Program.Surface.Sphere)) 
-                surf = Program.Surface.Sphere;
-            if (RadioButton("Тор", surf == Program.Surface.Torus)) 
-                surf = Program.Surface.Torus;
+            if (RadioButton("Сфера", surf == SurfaceType.Sphere)) 
+                surf = SurfaceType.Sphere;
+            if (RadioButton("Тор", surf == SurfaceType.Torus)) 
+                surf = SurfaceType.Torus;
         });
         
-        selectedSurface = surf;
+        selectedSurfaceType = surf;
         Surface surface = surf switch
         {
-            Program.Surface.Sphere => _sphere,
-            Program.Surface.Torus  => _torus,
+            SurfaceType.Sphere => _sphere,
+            SurfaceType.Torus  => _torus,
             _ => _sphere
         };
         

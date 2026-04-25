@@ -1,8 +1,36 @@
-#pragma warning disable CS0618 // Type or member is obsolete
-
-using static CSharpSphere.Program;
+#pragma warning disable CS0618
 
 namespace CSharpSphere;
+
+public class Sphere() : Surface(vMax: 180)
+{
+    public int R = 700;
+
+    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
+    {
+        float x = R * cosU * sinV;
+        float y = R * cosV;
+        float z = R * sinU * sinV;
+        
+        return new Vector3(x, y, z);
+    }
+}
+
+public class Torus : Surface
+{
+    public int R = 450;
+    public int r = 250;
+    
+    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
+    {
+        float x = (R + r * cosV) * cosU;
+        float y = (R + r * cosV) * sinU;
+        float z = r * sinV;
+        
+        return new Vector3(x, y, z);
+    }
+}
+
 
 public abstract class Surface(int vMax = 360)
 {
@@ -35,9 +63,9 @@ public abstract class Surface(int vMax = 360)
         }
 
         if (Shading)
-            DrawPolygons(_triangles, _points, TwoStep);
+            Program.DrawPolygons(_triangles, _points, TwoStep);
         else
-            DrawLines(_triangles, _points);
+            Program.DrawLines(_triangles, _points);
     }
 
     private void GeneratePoints()
@@ -144,34 +172,5 @@ public abstract class Surface(int vMax = 360)
             n.Z += (p0.X - p1.X) * (p0.Y + p1.Y);
         }
         return n;
-    }
-}
-
-public class Sphere() : Surface(vMax: 180)
-{
-    public int R = 700;
-
-    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
-    {
-        float x = R * cosU * sinV;
-        float y = R * cosV;
-        float z = R * sinU * sinV;
-        
-        return new Vector3(x, y, z);
-    }
-}
-
-public class Torus : Surface
-{
-    public int R = 450;
-    public int r = 250;
-    
-    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
-    {
-        float x = (R + r * cosV) * cosU;
-        float y = (R + r * cosV) * sinU;
-        float z = r * sinV;
-        
-        return new Vector3(x, y, z);
     }
 }

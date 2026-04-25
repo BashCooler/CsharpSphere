@@ -14,7 +14,7 @@ public static partial class Program
     private static IInputContext _input = null!;
     private static Gui _ui = null!;
 
-    private static Surface _selectedSurface = Surface.Sphere;
+    private static SurfaceType _selectedSurfaceType = SurfaceType.Sphere;
     
     private static readonly Sphere Sphere = new();
     private static readonly Torus Torus = new();
@@ -53,7 +53,7 @@ public static partial class Program
         OnResize(_window.Size);
     }
 
-    public enum Surface
+    public enum SurfaceType
     {
         Sphere,
         Torus
@@ -63,17 +63,17 @@ public static partial class Program
     {
         _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        switch (_selectedSurface)
+        switch (_selectedSurfaceType)
         {
             default:
-            case Surface.Sphere:
+            case SurfaceType.Sphere:
                 Sphere.Draw();
                 break;
-            case Surface.Torus:
+            case SurfaceType.Torus:
                 Torus.Draw();
                 break;
         }
-        _ui.RenderUi(deltaTime, ref _selectedSurface);
+        _ui.RenderUi(deltaTime, ref _selectedSurfaceType);
     }
 
     private static void OnResize(Vector2D<int> size)

@@ -6,7 +6,7 @@ namespace CSharpSphere;
 
 public static partial class Program
 {
-    public static void DrawLines(Triangle[] triangles, Vector3[,] points)
+    public static void DrawWireframe(Triangle[] triangles, Vector3[,] points)
     {
         DrawAxes(Axes.X | Axes.Y);
 
@@ -29,34 +29,42 @@ public static partial class Program
         DrawAxes(Axes.Z);
     }
 
-    public static void DrawPolygons(Triangle[] triangles, Vector3[,] points, bool TwoStep = true)
+    public static void DrawFlat(Triangle[] triangles, Vector3[,] points, bool twoStep = true, bool depthTest = false)
+    {
+        if (!twoStep)
+        {
+            DrawTriangles(triangles, points, Sides.All);
+            DrawAxes(Axes.All);
+            return;
+        }
+        
+        DrawTriangles(triangles, points, Sides.Back);
+        DrawAxes(Axes.All);
+        DrawTriangles(triangles, points, Sides.Front);
+    }
+    
+    [Flags]
+    private enum Sides
+    {
+        Front = 1 << 0,
+        Back = 1 << 1,
+        All = Front | Back
+    }
+
+    private static void DrawTriangles(Triangle[] triangles, Vector3[,] points, Sides sides)
     {
         _gl.Begin(GLEnum.Triangles);
 
         foreach (Triangle tri in triangles)
         {
-            if (TwoStep && tri.Front) continue;
-            
-            Vector3 p1 = tri.GetP1(points);
-            Vector3 p2 = tri.GetP2(points);
-            Vector3 p3 = tri.GetP3(points);
-            
-            Color color = tri.Color;
-            _gl.Color3(color.R, color.G, color.B);
-            
-            DrawTriangle(p1, p2, p3);
-        }
-        _gl.End();
-        
-        DrawAxes(Axes.All);
-
-        if (!TwoStep) return;
-        
-        _gl.Begin(GLEnum.Triangles);
-
-        foreach (Triangle tri in triangles)
-        {
-            if (!tri.Front) continue;
+            switch (tri.Front)
+            {
+                case true when sides.HasFlag(Sides.Front):
+                case false when sides.HasFlag(Sides.Back):
+                    break;
+                default:
+                    continue;
+            }
             
             Vector3 p1 = tri.GetP1(points);
             Vector3 p2 = tri.GetP2(points);

@@ -63,9 +63,9 @@ public abstract class Surface(int vMax = 360)
         }
 
         if (Shading)
-            Program.DrawPolygons(_triangles, _points, TwoStep);
+            Program.DrawFlat(_triangles, _points, TwoStep);
         else
-            Program.DrawLines(_triangles, _points);
+            Program.DrawWireframe(_triangles, _points);
     }
 
     private void GeneratePoints()

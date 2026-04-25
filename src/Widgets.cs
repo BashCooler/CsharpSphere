@@ -1,4 +1,3 @@
-using System.Numerics;
 using ImGuiNET;
 using Silk.NET.Input;
 using static ImGuiNET.ImGui;
@@ -11,7 +10,7 @@ public partial class Gui
     {
         BeginChild(
             name,
-            new Vector2(0, 0),
+            new System.Numerics.Vector2(0, 0),
             ImGuiChildFlags.Border | ImGuiChildFlags.AutoResizeY);
         PushItemWidth(GetContentRegionAvail().X * 1.0f);
         content();

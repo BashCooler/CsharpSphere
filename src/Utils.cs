@@ -27,7 +27,6 @@ public class Triangle((int, int) p1, (int, int) p2, (int, int) p3)
     }
 }
 
-
 public readonly struct VertexIndex(int i, int j)
 {
     public readonly int I = i;
@@ -35,7 +34,6 @@ public readonly struct VertexIndex(int i, int j)
 
     public override string ToString() => $"({I}, {J})";
 }
-
 
 public struct Vector3(float x, float y, float z)
 {

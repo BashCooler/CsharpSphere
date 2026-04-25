@@ -26,7 +26,7 @@ public static partial class Program
     {
         var options = WindowOptions.Default with
         {
-            Title = "Сфера",
+            Title = "Построение поверхности",
             Size = new Vector2D<int>(1280, 720),
             API = new GraphicsAPI(
                 ContextAPI.OpenGL,

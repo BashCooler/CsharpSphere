@@ -6,6 +6,8 @@ using Silk.NET.OpenGL.Legacy.Extensions.ImGui;
 using static CSharpSphere.Program;
 using static ImGuiNET.ImGui;
 
+// ReSharper disable InvertIf
+
 namespace CSharpSphere;
 
 public partial class Gui
@@ -55,7 +57,7 @@ public partial class Gui
             GetMainViewport(),
             ImGuiDockNodeFlags.PassthruCentralNode);
         
-        Begin("Параметры сферы");
+        Begin("Параметры");
 
         SurfaceType surf = selectedSurfaceType;
         

@@ -16,7 +16,7 @@ public class Sphere() : Surface(vMax: 180)
     }
 }
 
-public class Torus() : Surface(mode: Render.DepthTest)
+public class Torus() : Surface(mode: Render.DepthTest, inverseNormals: true)
 {
     public int R = 450;
     public int r = 250;
@@ -40,12 +40,12 @@ public enum Render
 }
 
 
-public abstract class Surface(int vMax = 360, Render mode = Render.Double)
+public abstract class Surface(int vMax = 360, Render mode = Render.Double, bool inverseNormals = false)
 {
     private Vector3[,] _points = null!;
     private Triangle[] _triangles = null!;
     private bool _update = true;
-    
+
     public int UMax = 360;
     public int VMax = vMax;
     public int UDiv = 20;
@@ -157,6 +157,7 @@ public abstract class Surface(int vMax = 360, Render mode = Render.Double)
                 tri.GetP3(_points)];
             
             Vector3 n = NewellNormal(points);
+            if (inverseNormals) n = -n;
             n = Vector3.Normalize(n);
             
             float cos = n.X * lightPos.X + n.Y * lightPos.Y + n.Z * lightPos.Z;

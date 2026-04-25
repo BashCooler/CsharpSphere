@@ -1,6 +1,7 @@
 using System.Numerics;
 using ImGuiNET;
 using Silk.NET.Input;
+using static ImGuiNET.ImGui;
 
 namespace CSharpSphere;
 
@@ -8,38 +9,38 @@ public partial class Gui
 {
     private static void Group(string name, Action content)
     {
-        ImGui.BeginChild(
+        BeginChild(
             name,
             new Vector2(0, 0),
             ImGuiChildFlags.Border | ImGuiChildFlags.AutoResizeY);
-        ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 1.0f);
+        PushItemWidth(GetContentRegionAvail().X * 1.0f);
         content();
-        ImGui.EndChild();
+        EndChild();
     }
 
     private void ColorEdit(string name, ref System.Numerics.Vector3 rgb, ref DragAngleState state, Action update)
     {
-        ImGui.ColorEdit3($"##{name}", ref rgb);
+        ColorEdit3($"##{name}", ref rgb);
         SetHoverCursor(ref state.Hover);
-        if (ImGui.IsItemActive()) update.Invoke();
+        if (IsItemActive()) update.Invoke();
     }
 
     private void DragAngle(string name, ref DragAngleState state, Surface surface, Func<int, Matrix4> transform, Action update)
     {
         const int limit = int.MaxValue;
         
-        ImGui.DragInt($"##{name}", ref state.Delta, 1, -limit, limit, "%d", Flag);
+        DragInt($"##{name}", ref state.Delta, 1, -limit, limit, "%d", Flag);
 
         SetHoverCursor(ref state.Hover);
 
-        if (ImGui.IsItemActivated()) 
+        if (IsItemActivated()) 
             state.Initial = surface.TransformationMat;
-        if (ImGui.IsItemActive())
+        if (IsItemActive())
         {
             surface.TransformationMat = state.Initial * transform(state.Delta);
             update.Invoke();
         }
-        if (!ImGui.IsItemDeactivated()) 
+        if (!IsItemDeactivated()) 
             return;
         
         state.Initial = surface.TransformationMat;
@@ -48,42 +49,42 @@ public partial class Gui
 
     private void SetHoverCursor(ref bool hover)
     {
-        if (ImGui.IsItemHovered())
+        if (IsItemHovered())
         {
             hover = true;
             _input.Mice[0].Cursor.StandardCursor = StandardCursor.HResize;
         }
-        if (hover && !ImGui.IsItemHovered())
+        if (hover && !IsItemHovered())
         {
             _input.Mice[0].Cursor.StandardCursor = StandardCursor.Arrow;
             hover = false;
         }
-        hover = ImGui.IsItemHovered();
+        hover = IsItemHovered();
     }
 
     private static void SliderI(string label, ref int v, int vMin, int vMax, Action update)
     {
         Label($"{vMin}", label, $"{vMax}");
-        bool active = ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
+        bool active = SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
         if (active) update.Invoke();
         AddDoubleClickToEditEvent();
     }
 
     private static void Label(string left, string center, string right)
     {
-        float maxWidth = ImGui.GetContentRegionAvail().X;
-        float padding = ImGui.GetStyle().WindowPadding.X;
-        ImGui.Text(left);
-        ImGui.SameLine((maxWidth - ImGui.CalcTextSize(center).X) * 0.5f + padding); 
-        ImGui.Text(center);
-        ImGui.SameLine(maxWidth - ImGui.CalcTextSize(right).X + padding); 
-        ImGui.Text(right);
+        float maxWidth = GetContentRegionAvail().X;
+        float padding = GetStyle().WindowPadding.X;
+        Text(left);
+        SameLine((maxWidth - CalcTextSize(center).X) * 0.5f + padding); 
+        Text(center);
+        SameLine(maxWidth - CalcTextSize(right).X + padding); 
+        Text(right);
     }
 
     private static void AddDoubleClickToEditEvent()
     {
-        if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
-            ImGui.SetKeyboardFocusHere(-1);
+        if (IsItemHovered() && IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
+            SetKeyboardFocusHere(-1);
     }
     
     private struct DragAngleState

@@ -1,4 +1,3 @@
-using System.Numerics;
 using ImGuiNET;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
@@ -9,11 +8,12 @@ using static ImGuiNET.ImGui;
 
 namespace CSharpSphere;
 
-public class Gui
+public partial class Gui
 {
     private const ImGuiSliderFlags Flag = ImGuiSliderFlags.AlwaysClamp;
     
     private readonly Sphere _sphere;
+    private readonly Torus _torus;
     private readonly IInputContext _input;
     private readonly ImGuiController _controller;
     
@@ -23,12 +23,13 @@ public class Gui
     private DragAngleState _stateOuterColor;
     private DragAngleState _stateInnerColor;
 
-    public Gui(GL gl, IWindow window, IInputContext input, Sphere sphere,
+    public Gui(GL gl, IWindow window, IInputContext input, Sphere sphere, Torus torus,
         int fontSize, float fontScale = 1.0f, float scale = 1.0f)
     {
         _input = input;
         _sphere = sphere;
-        
+        _torus = torus;
+
         var fontConfig = new ImGuiFontConfig(
             Path.Combine(AppContext.BaseDirectory, "fonts", "Better VCR 6.1.ttf"),
             fontSize,
@@ -45,7 +46,7 @@ public class Gui
         PushStyleVar(ImGuiStyleVar.GrabRounding, 4);
     }
 
-    public void RenderUi(double deltaTime)
+    public void RenderUi(double deltaTime, ref Program.Surface selectedSurface)
     {
         _controller.Update((float)deltaTime);
 
@@ -56,147 +57,88 @@ public class Gui
         
         Begin("Параметры сферы");
 
+        Program.Surface surf = selectedSurface;
+        
+        Group("0", () =>
+        {
+            Label("", "Поверхность", "");
+            if (RadioButton("Сфера", surf == Program.Surface.Sphere)) 
+                surf = Program.Surface.Sphere;
+            if (RadioButton("Тор", surf == Program.Surface.Torus)) 
+                surf = Program.Surface.Torus;
+        });
+        
+        selectedSurface = surf;
+        Surface surface = surf switch
+        {
+            Program.Surface.Sphere => _sphere,
+            Program.Surface.Torus  => _torus,
+            _ => _sphere
+        };
+        
         Group("1", () =>
         {
-            SliderI("R, пиксель", ref _sphere.R, 0, 3000, ref _sphere.Update);
-            
+            switch (surface)
+            {
+                default:
+                    SliderI("R, пиксель", ref _sphere.R, 0, 3000, ref _sphere.Update);
+                    break;
+                case Torus:
+                    SliderI("R, пиксель", ref _torus.R, 0, 3000, ref _torus.Update);
+                    SliderI("r, пиксель", ref _torus.r, 0, 3000, ref _torus.Update);
+                    break;
+            }
         });
 
         Group("2", () =>
         {
-            SliderI("Max U", ref _sphere.UMax, 0, 360, ref _sphere.Update);
-            SliderI("Мax V", ref _sphere.VMax, 0, 360, ref _sphere.Update);
+            SliderI("Max U", ref surface.UMax, 0, 360, ref surface.Update);
+            var vMax = surface is Sphere ? 180 : 360;
+            SliderI("Мax V", ref surface.VMax, 0, vMax, ref surface.Update);
         });
 
         Group("3", () =>
         {
-            SliderI("Div U", ref _sphere.UDiv, 0, 200, ref _sphere.Update);
-            SliderI("Div V", ref _sphere.VDiv, 0, 200, ref _sphere.Update);
+            SliderI("Div U", ref surface.UDiv, 0, 200, ref surface.Update);
+            SliderI("Div V", ref surface.VDiv, 0, 200, ref surface.Update);
         });
 
         Group("4", () =>
         {
             Label("", "Поворот по X, Y, Z", "");
-            DragAngle("AngleX", ref _stateX, Matrix4.GetRotateX, ref _sphere.Update);
-            DragAngle("AngleY", ref _stateY, Matrix4.GetRotateY, ref _sphere.Update);
-            DragAngle("AngleZ", ref _stateZ, Matrix4.GetRotateZ, ref _sphere.Update);
+            DragAngle("AngleX", ref _stateX, surface, Matrix4.GetRotateX, ref surface.Update);
+            DragAngle("AngleY", ref _stateY, surface, Matrix4.GetRotateY, ref surface.Update);
+            DragAngle("AngleZ", ref _stateZ, surface, Matrix4.GetRotateZ, ref surface.Update);
         });
 
         Group("5", () =>
         {
             Label("", "Отрисовка", "");
-            bool shadingChanged = Checkbox("Flat закраска", ref _sphere.Shading);
-            if (shadingChanged) _sphere.Update = true;
+            bool shadingChanged = Checkbox("Flat закраска", ref surface.Shading);
+            if (shadingChanged) surface.Update = true;
 
-            if (!_sphere.Shading) BeginDisabled();
-            Checkbox("Отрисовка в 2 этапа", ref _sphere.TwoStep);
+            if (!surface.Shading) BeginDisabled();
+            Checkbox("Отрисовка в 2 этапа", ref surface.TwoStep);
             
             Group("6", () =>
             {
                 Label("", "Внешний цвет", "");
-                ColorEdit("OuterColor", ref _sphere.OuterColor.Rgb, ref _stateOuterColor, ref _sphere.Update);
+                ColorEdit("OuterColor", ref surface.OuterColor.Rgb, ref _stateOuterColor, ref surface.Update);
             });
             
             Group("7", () =>
             {
                 Label("", "Внутренний цвет", "");
-                ColorEdit("InnerColor", ref _sphere.InnerColor.Rgb, ref _stateInnerColor, ref _sphere.Update);
+                ColorEdit("InnerColor", ref surface.InnerColor.Rgb, ref _stateInnerColor, ref surface.Update);
             });
             
-            if (!_sphere.Shading) EndDisabled();
+            if (!surface.Shading) EndDisabled();
         });
         
         End();
         _controller.Render();
     }
 
-    private static void Group(string name, Action content)
-    {
-        BeginChild(
-            name, 
-            new Vector2(0, 0), 
-            ImGuiChildFlags.Border | ImGuiChildFlags.AutoResizeY);
-        PushItemWidth(GetContentRegionAvail().X * 1.0f);
-        content();
-        EndChild();
-    }
-    
-    private void ColorEdit(string name, ref System.Numerics.Vector3 rgb, ref DragAngleState state, ref bool update)
-    {
-        ColorEdit3($"##{name}", ref rgb);
-        SetHoverCursor(ref state.Hover);
-        if (IsItemActive()) update = true;
-    }
-
-    private void DragAngle(string name, ref DragAngleState state, Func<int, Matrix4> transform, ref bool update)
-    {
-        const int limit = int.MaxValue;
-        
-        DragInt($"##{name}", ref state.Delta, 1, -limit, limit, "%d", Flag);
-
-        SetHoverCursor(ref state.Hover);
-
-        if (IsItemActivated()) 
-            state.Initial = _sphere.TransformationMat;
-        if (IsItemActive())
-        {
-            _sphere.TransformationMat = state.Initial * transform(state.Delta);
-            update = true;
-        }
-        if (!IsItemDeactivated()) 
-            return;
-        
-        state.Initial = _sphere.TransformationMat;
-        state.Delta = 0;
-    }
-
-    private void SetHoverCursor(ref bool hover)
-    {
-        if (IsItemHovered())
-        {
-            hover = true;
-            _input.Mice[0].Cursor.StandardCursor = StandardCursor.HResize;
-        }
-        if (hover && !IsItemHovered())
-        {
-            _input.Mice[0].Cursor.StandardCursor = StandardCursor.Arrow;
-            hover = false;
-        }
-        hover = IsItemHovered();
-    }
-
-    private static void SliderI(string label, ref int v, int vMin, int vMax, ref bool update)
-    {
-        Label($"{vMin}", label, $"{vMax}");
-        bool active = SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
-        if (active) update = true;
-        AddDoubleClickToEditEvent();
-    }
-    
-    private static void Label(string left, string center, string right)
-    {
-        float maxWidth = GetContentRegionAvail().X;
-        float padding = GetStyle().WindowPadding.X;
-        Text(left);
-        SameLine((maxWidth - CalcTextSize(center).X) * 0.5f + padding); 
-        Text(center);
-        SameLine(maxWidth - CalcTextSize(right).X + padding); 
-        Text(right);
-    }
-    
-    private static void AddDoubleClickToEditEvent()
-    {
-        if (IsItemHovered() && IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
-            SetKeyboardFocusHere(-1);
-    }
-
     public void Dispose() => _controller.Dispose();
-
-    private struct DragAngleState
-    {
-        public Matrix4 Initial;
-        public int Delta;
-        public bool Hover;
-    }
 }
 

@@ -13,7 +13,11 @@ public static partial class Program
     private static IWindow _window = null!;
     private static IInputContext _input = null!;
     private static Gui _ui = null!;
+
+    private static Surface _selectedSurface = Surface.Sphere;
+    
     private static readonly Sphere Sphere = new();
+    private static readonly Torus Torus = new();
 
     private const int Font = 18;
     private static int _windowMinSize;
@@ -45,16 +49,31 @@ public static partial class Program
     {
         _gl = GL.GetApi(_window);
         _input = _window.CreateInput();
-        _ui = new Gui(_gl, _window, _input, Sphere, Font);
+        _ui = new Gui(_gl, _window, _input, Sphere, Torus, Font);
         OnResize(_window.Size);
+    }
+
+    public enum Surface
+    {
+        Sphere,
+        Torus
     }
 
     private static void OnRender(double deltaTime)
     {
         _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        Sphere.Draw();
-        _ui.RenderUi(deltaTime);
+        switch (_selectedSurface)
+        {
+            default:
+            case Surface.Sphere:
+                Sphere.Draw();
+                break;
+            case Surface.Torus:
+                Torus.Draw();
+                break;
+        }
+        _ui.RenderUi(deltaTime, ref _selectedSurface);
     }
 
     private static void OnResize(Vector2D<int> size)

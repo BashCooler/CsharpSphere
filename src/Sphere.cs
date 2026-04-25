@@ -4,13 +4,13 @@ using static CSharpSphere.Program;
 
 namespace CSharpSphere;
 
-public abstract class Surface
+public abstract class Surface(int vMax = 360)
 {
     private Vector3[,] _points = null!;
     private Triangle[] _triangles = null!;
     
     public int UMax = 360;
-    public int VMax = 180;
+    public int VMax = vMax;
     public int UDiv = 20;
     public int VDiv = 20;
 
@@ -147,7 +147,7 @@ public abstract class Surface
     }
 }
 
-public class Sphere : Surface
+public class Sphere() : Surface(vMax: 180)
 {
     public int R = 700;
 
@@ -156,6 +156,21 @@ public class Sphere : Surface
         float x = R * cosU * sinV;
         float y = R * cosV;
         float z = R * sinU * sinV;
+        
+        return new Vector3(x, y, z);
+    }
+}
+
+public class Torus : Surface
+{
+    public int R = 450;
+    public int r = 250;
+    
+    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
+    {
+        float x = (R + r * cosV) * cosU;
+        float y = (R + r * cosV) * sinU;
+        float z = r * sinV;
         
         return new Vector3(x, y, z);
     }

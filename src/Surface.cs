@@ -24,8 +24,8 @@ public class Torus() : Surface(mode: Render.DepthTest)
     protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
     {
         float x = (R + r * cosV) * cosU;
-        float y = (R + r * cosV) * sinU;
-        float z = r * sinV;
+        float y = r * sinV;
+        float z = (R + r * cosV) * sinU;
         
         return new Vector3(x, y, z);
     }
@@ -44,13 +44,13 @@ public abstract class Surface(int vMax = 360, Render mode = Render.Double)
 {
     private Vector3[,] _points = null!;
     private Triangle[] _triangles = null!;
+    private bool _update = true;
     
     public int UMax = 360;
     public int VMax = vMax;
     public int UDiv = 20;
     public int VDiv = 20;
 
-    public bool Update = true;
     public bool Shading = false;
     public Render RenderMode = mode;
     
@@ -58,16 +58,18 @@ public abstract class Surface(int vMax = 360, Render mode = Render.Double)
     
     public Color OuterColor = new(0.8f, 0.2f, 0.2f);
     public Color InnerColor = new(0.2f, 0.2f, 0.65f);
-
+    
+    public void Update() => _update = true;
+    
     public void Draw()
     {
-        if (Update)
+        if (_update)
         {
             GeneratePoints();
             GenerateTriangles();
             Transform();
             if (Shading) GenerateColors();
-            Update = false;
+            _update = false;
         }
 
         if (Shading)

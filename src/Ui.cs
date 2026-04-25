@@ -81,34 +81,34 @@ public partial class Gui
             switch (surface)
             {
                 default:
-                    SliderI("R, пиксель", ref _sphere.R, 0, 3000, ref _sphere.Update);
+                    SliderI("R, пиксель", ref _sphere.R, 0, 3000, _sphere.Update);
                     break;
                 case Torus:
-                    SliderI("R, пиксель", ref _torus.R, 0, 3000, ref _torus.Update);
-                    SliderI("r, пиксель", ref _torus.r, 0, 3000, ref _torus.Update);
+                    SliderI("R, пиксель", ref _torus.R, 0, 3000, _torus.Update);
+                    SliderI("r, пиксель", ref _torus.r, 0, 3000, _torus.Update);
                     break;
             }
         });
 
         Group("2", () =>
         {
-            SliderI("Max U", ref surface.UMax, 0, 360, ref surface.Update);
+            SliderI("Max U", ref surface.UMax, 0, 360, surface.Update);
             var vMax = surface is Sphere ? 180 : 360;
-            SliderI("Мax V", ref surface.VMax, 0, vMax, ref surface.Update);
+            SliderI("Мax V", ref surface.VMax, 0, vMax, surface.Update);
         });
 
         Group("3", () =>
         {
-            SliderI("Div U", ref surface.UDiv, 0, 200, ref surface.Update);
-            SliderI("Div V", ref surface.VDiv, 0, 200, ref surface.Update);
+            SliderI("Div U", ref surface.UDiv, 0, 200, surface.Update);
+            SliderI("Div V", ref surface.VDiv, 0, 200, surface.Update);
         });
 
         Group("4", () =>
         {
             Label("", "Поворот по X, Y, Z", "");
-            DragAngle("AngleX", ref _stateX, surface, Matrix4.GetRotateX, ref surface.Update);
-            DragAngle("AngleY", ref _stateY, surface, Matrix4.GetRotateY, ref surface.Update);
-            DragAngle("AngleZ", ref _stateZ, surface, Matrix4.GetRotateZ, ref surface.Update);
+            DragAngle("AngleX", ref _stateX, surface, Matrix4.GetRotateX, surface.Update);
+            DragAngle("AngleY", ref _stateY, surface, Matrix4.GetRotateY, surface.Update);
+            DragAngle("AngleZ", ref _stateZ, surface, Matrix4.GetRotateZ, surface.Update);
         });
 
         Group("5", () =>
@@ -119,13 +119,13 @@ public partial class Gui
                 if (RadioButton("Wireframe", !surface.Shading))
                 {
                     surface.Shading = false;
-                    surface.Update = true;
+                    surface.Update();
                 }
 
                 if (RadioButton("Flat закраска", surface.Shading))
                 {
                     surface.Shading = true;
-                    surface.Update = true;
+                    surface.Update();
                 }
             });
 
@@ -145,13 +145,13 @@ public partial class Gui
             Group("6", () =>
             {
                 Label("", "Внешний цвет", "");
-                ColorEdit("OuterColor", ref surface.OuterColor.Rgb, ref _stateOuterColor, ref surface.Update);
+                ColorEdit("OuterColor", ref surface.OuterColor.Rgb, ref _stateOuterColor, surface.Update);
             });
             
             Group("7", () =>
             {
                 Label("", "Внутренний цвет", "");
-                ColorEdit("InnerColor", ref surface.InnerColor.Rgb, ref _stateInnerColor, ref surface.Update);
+                ColorEdit("InnerColor", ref surface.InnerColor.Rgb, ref _stateInnerColor, surface.Update);
             });
             
             if (!surface.Shading) EndDisabled();

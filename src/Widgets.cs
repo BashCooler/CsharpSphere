@@ -17,14 +17,14 @@ public partial class Gui
         ImGui.EndChild();
     }
 
-    private void ColorEdit(string name, ref System.Numerics.Vector3 rgb, ref DragAngleState state, ref bool update)
+    private void ColorEdit(string name, ref System.Numerics.Vector3 rgb, ref DragAngleState state, Action update)
     {
         ImGui.ColorEdit3($"##{name}", ref rgb);
         SetHoverCursor(ref state.Hover);
-        if (ImGui.IsItemActive()) update = true;
+        if (ImGui.IsItemActive()) update.Invoke();
     }
 
-    private void DragAngle(string name, ref DragAngleState state, Surface surface, Func<int, Matrix4> transform, ref bool update)
+    private void DragAngle(string name, ref DragAngleState state, Surface surface, Func<int, Matrix4> transform, Action update)
     {
         const int limit = int.MaxValue;
         
@@ -37,7 +37,7 @@ public partial class Gui
         if (ImGui.IsItemActive())
         {
             surface.TransformationMat = state.Initial * transform(state.Delta);
-            update = true;
+            update.Invoke();
         }
         if (!ImGui.IsItemDeactivated()) 
             return;
@@ -61,11 +61,11 @@ public partial class Gui
         hover = ImGui.IsItemHovered();
     }
 
-    private static void SliderI(string label, ref int v, int vMin, int vMax, ref bool update)
+    private static void SliderI(string label, ref int v, int vMin, int vMax, Action update)
     {
         Label($"{vMin}", label, $"{vMax}");
         bool active = ImGui.SliderInt($"##{label}", ref v, vMin, vMax, "%d", Flag);
-        if (active) update = true;
+        if (active) update.Invoke();
         AddDoubleClickToEditEvent();
     }
 

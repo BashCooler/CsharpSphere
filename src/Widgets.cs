@@ -18,9 +18,11 @@ public partial class Gui
         EndChild();
     }
 
-    private void ColorEdit(string name, ref System.Numerics.Vector3 rgb, ref DragAngleState state, Action update)
+    private void ColorEdit(string name, ref Color color, ref DragAngleState state, Action update)
     {
-        ColorEdit3($"##{name}", ref rgb);
+        var rgb = new System.Numerics.Vector3(color.R, color.G, color.B);
+        if (ColorEdit3($"##{name}", ref rgb)) 
+            color = new Color(rgb.X, rgb.Y, rgb.Z);
         SetHoverCursor(ref state.Hover);
         if (IsItemActive()) update.Invoke();
     }

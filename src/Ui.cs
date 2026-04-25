@@ -145,13 +145,13 @@ public partial class Gui
             Group("6", () =>
             {
                 Label("", "Внешний цвет", "");
-                ColorEdit("OuterColor", ref surface.OuterColor.Rgb, ref _stateOuterColor, surface.Update);
+                ColorEdit("OuterColor", ref surface.OuterColor, ref _stateOuterColor, surface.Update);
             });
             
             Group("7", () =>
             {
                 Label("", "Внутренний цвет", "");
-                ColorEdit("InnerColor", ref surface.InnerColor.Rgb, ref _stateInnerColor, surface.Update);
+                ColorEdit("InnerColor", ref surface.InnerColor, ref _stateInnerColor, surface.Update);
             });
             
             if (!surface.Shading) EndDisabled();

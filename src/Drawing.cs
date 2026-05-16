@@ -39,9 +39,9 @@ public static partial class Program
                 break;
             default:
             case Render.Double:
-                DrawTriangles(triangles, points, Sides.Back);
+                DrawTriangles(triangles, points, Sides.Inner);
                 DrawAxes(Axes.All);
-                DrawTriangles(triangles, points, Sides.Front);
+                DrawTriangles(triangles, points, Sides.Outer);
                 break;
             case Render.DepthTest:
                 DrawTriangles(triangles, points, Sides.All, true);
@@ -53,9 +53,9 @@ public static partial class Program
     [Flags]
     private enum Sides
     {
-        Front = 1 << 0,
-        Back = 1 << 1,
-        All = Front | Back
+        Outer = 1 << 0,
+        Inner = 1 << 1,
+        All = Outer | Inner
     }
 
     private static void DrawTriangles(Triangle[] triangles, Vector3[,] points, Sides sides, bool depthTest = false)
@@ -65,10 +65,10 @@ public static partial class Program
 
         foreach (Triangle tri in triangles)
         {
-            switch (tri.Front)
+            switch (tri.Outer)
             {
-                case true when sides.HasFlag(Sides.Front):
-                case false when sides.HasFlag(Sides.Back):
+                case true when sides.HasFlag(Sides.Outer):
+                case false when sides.HasFlag(Sides.Inner):
                     break;
                 default:
                     continue;
@@ -81,15 +81,10 @@ public static partial class Program
             Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
 
-            switch (depthTest)
-            {
-                case true: 
-                    DrawTriangle3D(p1, p2, p3);
-                    break;
-                case false:
-                    DrawTriangle(p1, p2, p3);
-                    break;
-            }
+            if (depthTest)
+                DrawTriangle3D(p1, p2, p3);
+            else 
+                DrawTriangle(p1, p2, p3);
         }
         
         _gl.End();

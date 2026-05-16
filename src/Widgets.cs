@@ -36,7 +36,7 @@ public partial class Gui
 
         if (IsItemActivated()) 
             state.Initial = surface.TransformationMat;
-        if (IsItemActive())
+        if (IsItemActive() && state.Delta != 0)
         {
             surface.TransformationMat = state.Initial * transform(state.Delta);
             update.Invoke();

@@ -6,7 +6,7 @@ public class Sphere() : Surface(vMax: 180)
 {
     public int R = 700;
 
-    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
+    protected override Vector3 GeneratePoint(float sinU, float cosU, float sinV, float cosV)
     {
         float x = R * cosU * sinV;
         float y = R * cosV;
@@ -16,14 +16,14 @@ public class Sphere() : Surface(vMax: 180)
     }
 }
 
-public class Torus() : Surface(mode: Render.DepthTest, inverseNormals: true)
+public class Torus() : Surface(mode: Render.DepthTest)
 {
     public int R = 450;
     public int r = 250;
     
-    protected override Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU)
+    protected override Vector3 GeneratePoint(float sinU, float cosU, float sinV, float cosV)
     {
-        float x = (R + r * cosV) * cosU;
+        float x = (R + r * cosV) * -cosU;
         float y = r * sinV;
         float z = (R + r * cosV) * sinU;
         
@@ -40,7 +40,7 @@ public enum Render
 }
 
 
-public abstract class Surface(int vMax = 360, Render mode = Render.Double, bool inverseNormals = false)
+public abstract class Surface(int vMax = 360, Render mode = Render.Double)
 {
     private Vector3[,] _points = null!;
     private Triangle[] _triangles = null!;
@@ -80,87 +80,72 @@ public abstract class Surface(int vMax = 360, Render mode = Render.Double, bool 
 
     private void GeneratePoints()
     {
-        var points = new Vector3[VDiv + 1, UDiv + 1];
+        _points = new Vector3[VDiv + 1, UDiv + 1];
 
         Parallel.For(0, VDiv + 1, row =>
         {
             var v = (float)row / VDiv * (VMax * MathF.PI / 180f);
 
-            float sinV = MathF.Sin(v);
-            float cosV = MathF.Cos(v);
+            var sinV = MathF.Sin(v);
+            var cosV = MathF.Cos(v);
 
             for (int col = 0; col < UDiv + 1; col++)
             {
                 var u = (float)col / UDiv * (UMax * MathF.PI / 180f);
 
-                float sinU = MathF.Sin(u);
-                float cosU = MathF.Cos(u);
+                var sinU = MathF.Sin(u);
+                var cosU = MathF.Cos(u);
 
-                points[row, col] = GeneratePoint(cosU, sinV, cosV, sinU);
+                _points[row, col] = GeneratePoint(sinU, cosU, sinV, cosV);
             }
         });
-        
-        _points = points;
     }
 
-    protected abstract Vector3 GeneratePoint(float cosU, float sinV, float cosV, float sinU);
+    protected abstract Vector3 GeneratePoint(float sinU, float cosU, float sinV, float cosV);
 
     private void GenerateTriangles()
     {
-        int cols = UDiv + 1;
-        int rows = VDiv + 1;
-        
-        var triangles = new Triangle[2 * (rows - 1) * (cols - 1)];
+        _triangles = new Triangle[2 * VDiv * UDiv];
 
-        Parallel.For(0, rows - 1, i =>
+        Parallel.For(0, VDiv, i =>
         {
-            for (int j = 0; j < cols - 1; j++)
+            for (int j = 0; j < UDiv; j++)
             {
-                int index = 2 * (i * (cols - 1) + j);
-                
-                triangles[index] = new Triangle(
+                int index = 2 * (i * UDiv + j);
+
+                _triangles[index] = new Triangle(
                     (i, j),
                     (i, j + 1),
                     (i + 1, j));
-                triangles[index + 1] = new Triangle(
+                _triangles[index + 1] = new Triangle(
                     (i, j + 1),
                     (i + 1, j + 1),
                     (i + 1, j));
             }
         });
-        
-        _triangles = triangles;
     }
     
     private void Transform()
     {
-        var result = new Vector3[VDiv + 1, UDiv + 1];
-
         Parallel.For(0, VDiv + 1, row =>
         {
             for (int col = 0; col < UDiv + 1; col++)
-                result[row, col] = _points[row, col] * TransformationMat;
+                _points[row, col] *= TransformationMat;
         });
-        
-        _points = result;
     }
     
     private void GenerateColors()
     {
-        var lightPos = new Vector3(0f, 0f, 1f);
-
         foreach (Triangle tri in _triangles)
         {
-            Vector3[] points = [
-                tri.GetP1(_points), 
-                tri.GetP2(_points), 
-                tri.GetP3(_points)];
-            
-            Vector3 n = NewellNormal(points);
-            if (inverseNormals) n = -n;
+            Vector3 n = NewellNormal([
+                tri.GetP1(_points),
+                tri.GetP2(_points),
+                tri.GetP3(_points)
+            ]);
             n = Vector3.Normalize(n);
             
-            float cos = n.X * lightPos.X + n.Y * lightPos.Y + n.Z * lightPos.Z;
+            float cos = n.Z;
             
             if (cos >= 0) 
                 tri.SetColor(OuterColor * cos).SetFront(true);

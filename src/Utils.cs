@@ -8,7 +8,7 @@ public class Triangle((int, int) p1, (int, int) p2, (int, int) p3)
     private readonly VertexIndex _p3 = new(p3.Item1, p3.Item2);
     
     public Color Color;
-    public bool Front = true;
+    public bool Outer = true;
 
     public Vector3 GetP1(Vector3[,] points) => points[_p1.I, _p1.J];
     public Vector3 GetP2(Vector3[,] points) => points[_p2.I, _p2.J];
@@ -22,7 +22,7 @@ public class Triangle((int, int) p1, (int, int) p2, (int, int) p3)
 
     public Triangle SetFront(bool front)
     {
-        Front = front;
+        Outer = front;
         return this;
     }
 }

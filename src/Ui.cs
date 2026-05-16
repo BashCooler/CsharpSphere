@@ -42,7 +42,7 @@ public partial class Gui
         GetIO().FontGlobalScale = fontScale;
         GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
         GetStyle().ScaleAllSizes(scale);
-        StyleColorsClassic();
+        StyleColorsLight();
         PushStyleVar(ImGuiStyleVar.WindowRounding, 4);
         PushStyleVar(ImGuiStyleVar.FrameRounding, 4);
         PushStyleVar(ImGuiStyleVar.GrabRounding, 4);

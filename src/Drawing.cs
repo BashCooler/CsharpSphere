@@ -11,7 +11,7 @@ public static partial class Program
         DrawAxes(Axes.X | Axes.Y);
 
         _gl.Begin(GLEnum.Lines);
-        _gl.Color3(0.6f, 0.6f, 0.6f);
+        _gl.Color3(0.5f, 0.5f, 0.5f);
 
         foreach (Triangle tri in triangles)
         {

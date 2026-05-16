@@ -61,7 +61,7 @@ public static partial class Program
 
     private static void OnRender(double deltaTime)
     {
-        _gl.ClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        _gl.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         _gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         switch (_selectedSurfaceType)
         {

@@ -139,18 +139,20 @@ public abstract class Surface(int vMax = 360, Render mode = Render.Double)
         foreach (Triangle tri in _triangles)
         {
             Vector3 n = NewellNormal([
-                tri.GetP1(_points),
-                tri.GetP2(_points),
-                tri.GetP3(_points)
+                tri.P1(_points),
+                tri.P2(_points),
+                tri.P3(_points)
             ]);
             n = Vector3.Normalize(n);
             
             float cos = n.Z;
             
-            if (cos >= 0) 
-                tri.SetColor(OuterColor * cos).SetFront(true);
-            else
-                tri.SetColor(InnerColor * MathF.Abs(cos)).SetFront(false);
+            if (cos >= 0) tri
+                .SetColor(OuterColor * cos)
+                .SetOuter(true);
+            else tri
+                .SetColor(InnerColor * MathF.Abs(cos))
+                .SetOuter(false);
         }
     }
 

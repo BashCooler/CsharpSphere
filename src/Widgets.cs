@@ -87,11 +87,4 @@ public partial class Gui
         if (IsItemHovered() && IsMouseDoubleClicked(ImGuiMouseButton.Left)) 
             SetKeyboardFocusHere(-1);
     }
-    
-    private struct DragAngleState
-    {
-        public Matrix4 Initial;
-        public int Delta;
-        public bool Hover;
-    }
 }

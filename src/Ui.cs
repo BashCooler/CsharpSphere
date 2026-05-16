@@ -61,7 +61,7 @@ public partial class Gui
 
         SurfaceType surf = selectedSurfaceType;
         
-        Group("0", () =>
+        Group("Surface type", () =>
         {
             Label("", "Поверхность", "");
             if (RadioButton("Сфера", surf == SurfaceType.Sphere)) 
@@ -78,7 +78,7 @@ public partial class Gui
             _ => _sphere
         };
         
-        Group("1", () =>
+        Group("Parameters", () =>
         {
             switch (surface)
             {
@@ -92,20 +92,20 @@ public partial class Gui
             }
         });
 
-        Group("2", () =>
+        Group("Max U and V", () =>
         {
             SliderI("Max U", ref surface.UMax, 0, 360, surface.Update);
             var vMax = surface is Sphere ? 180 : 360;
             SliderI("Мax V", ref surface.VMax, 0, vMax, surface.Update);
         });
 
-        Group("3", () =>
+        Group("Div U and V", () =>
         {
             SliderI("Div U", ref surface.UDiv, 0, 200, surface.Update);
             SliderI("Div V", ref surface.VDiv, 0, 200, surface.Update);
         });
 
-        Group("4", () =>
+        Group("Rotation angles", () =>
         {
             Label("", "Поворот по X, Y, Z", "");
             DragAngle("AngleX", ref _stateX, surface, Matrix4.GetRotateX, surface.Update);
@@ -113,10 +113,10 @@ public partial class Gui
             DragAngle("AngleZ", ref _stateZ, surface, Matrix4.GetRotateZ, surface.Update);
         });
 
-        Group("5", () =>
+        Group("Render options", () =>
         {
             Label("", "Отрисовка", "");
-            Group("Surface", () =>
+            Group("Shading", () =>
             {
                 if (RadioButton("Wireframe", !surface.Shading))
                 {
@@ -139,18 +139,18 @@ public partial class Gui
                     surface.RenderMode = Render.Single;
                 if (RadioButton("2 цикла", surface.RenderMode == Render.Double)) 
                     surface.RenderMode = Render.Double;
-                if (RadioButton("Z-буфер (OpenGL)", surface.RenderMode == Render.DepthTest)) 
+                if (RadioButton("Z-буфер (OpenGL)",
+                        surface.RenderMode == Render.DepthTest))
                     surface.RenderMode = Render.DepthTest;
             });
             
-            
-            Group("6", () =>
+            Group("Group outer color", () =>
             {
                 Label("", "Внешний цвет", "");
                 ColorEdit("OuterColor", ref surface.OuterColor, ref _stateOuterColor, surface.Update);
             });
             
-            Group("7", () =>
+            Group("Group inner color", () =>
             {
                 Label("", "Внутренний цвет", "");
                 ColorEdit("InnerColor", ref surface.InnerColor, ref _stateInnerColor, surface.Update);
@@ -161,6 +161,13 @@ public partial class Gui
         
         End();
         _controller.Render();
+    }
+        
+    private struct DragAngleState
+    {
+        public Matrix4 Initial;
+        public int Delta;
+        public bool Hover;
     }
 
     public void Dispose() => _controller.Dispose();

@@ -15,9 +15,9 @@ public static partial class Program
 
         foreach (Triangle tri in triangles)
         {
-            Vector3 p1 = tri.GetP1(points);
-            Vector3 p2 = tri.GetP2(points);
-            Vector3 p3 = tri.GetP3(points);
+            Vector3 p1 = tri.P1(points);
+            Vector3 p2 = tri.P2(points);
+            Vector3 p3 = tri.P3(points);
 
             DrawLine(p1, p2);
             DrawLine(p2, p3);
@@ -74,9 +74,9 @@ public static partial class Program
                     continue;
             }
             
-            Vector3 p1 = tri.GetP1(points);
-            Vector3 p2 = tri.GetP2(points);
-            Vector3 p3 = tri.GetP3(points);
+            Vector3 p1 = tri.P1(points);
+            Vector3 p2 = tri.P2(points);
+            Vector3 p3 = tri.P3(points);
             
             Color color = tri.Color;
             _gl.Color3(color.R, color.G, color.B);
